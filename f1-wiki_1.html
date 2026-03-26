@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F1 百科</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#E8002D;--red2:#ff1a45;--black:#07070a;--bg:#0c0c10;
+  --panel:#111116;--card:#17171d;--card2:#1e1e26;--border:#22222e;--border2:#2e2e3e;
+  --text:#ededf0;--muted:#6a6a7a;--dim:#38384a;--gold:#f5c842;--blue:#1e8fff;--green:#00c96a;
+  --nav-h:52px;--tab-h:44px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--black);color:var(--text);font-family:'Noto Sans SC',sans-serif;display:flex;flex-direction:column}
+
+/* ── GRID BG ── */
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(232,0,45,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(232,0,45,0.03) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0}
+
+/* ── TOPBAR ── */
+.topbar{height:var(--nav-h);display:flex;align-items:center;border-bottom:1px solid var(--border);background:rgba(7,7,10,0.97);backdrop-filter:blur(12px);position:relative;z-index:100;flex-shrink:0}
+.logo{background:var(--red);height:100%;display:flex;align-items:center;padding:0 20px 0 16px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:22px;letter-spacing:3px;color:#fff;clip-path:polygon(0 0,100% 0,88% 100%,0 100%);padding-right:32px;flex-shrink:0}
+.logo-sub{padding:0 20px;font-family:'Rajdhani',sans-serif;font-size:14px;letter-spacing:4px;color:var(--muted);text-transform:uppercase}
+.logo-sub span{color:var(--text)}
+.topbar-right{margin-left:auto;padding-right:16px;display:flex;align-items:center;gap:8px}
+.search-wrap{position:relative;display:flex;align-items:center}
+.search-input{background:var(--card);border:1px solid var(--border2);color:var(--text);padding:7px 36px 7px 12px;font-family:'Noto Sans SC',sans-serif;font-size:12px;outline:none;width:200px;border-radius:2px;transition:border-color .2s}
+.search-input:focus{border-color:var(--red);width:260px}
+.search-input::placeholder{color:var(--dim)}
+.search-btn{position:absolute;right:8px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0}
+.season-badge{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;background:var(--card2);border:1px solid var(--border2);color:var(--muted);padding:5px 12px}
+
+/* ── TABS ── */
+.tabs{height:var(--tab-h);display:flex;align-items:center;border-bottom:1px solid var(--border);background:var(--panel);position:relative;z-index:99;flex-shrink:0;padding:0 4px}
+.tab{display:flex;align-items:center;gap:7px;padding:0 18px;height:100%;background:none;border:none;color:var(--muted);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:color .15s;position:relative;border-bottom:2px solid transparent}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--text);border-bottom-color:var(--red)}
+.tab .t-icon{font-size:15px}
+.tab-count{font-size:10px;background:var(--card2);border:1px solid var(--border);padding:1px 6px;border-radius:10px;color:var(--dim)}
+
+/* ── LAYOUT ── */
+.app{flex:1;display:flex;overflow:hidden;position:relative;z-index:1}
+.sidebar{width:240px;flex-shrink:0;border-right:1px solid var(--border);background:var(--panel);overflow-y:auto;display:flex;flex-direction:column}
+.main-area{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+
+/* ── SIDEBAR ── */
+.sb-section{padding:12px 0 4px}
+.sb-label{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--dim);padding:0 14px 8px}
+.sb-item{display:flex;align-items:center;gap:10px;width:100%;padding:9px 14px;background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-align:left;transition:all .15s;border-left:2px solid transparent;font-family:'Noto Sans SC',sans-serif}
+.sb-item:hover{color:var(--text);background:var(--card)}
+.sb-item.active{color:var(--text);background:var(--card);border-left-color:var(--red)}
+.sb-item .si-icon{font-size:14px;width:16px;text-align:center;flex-shrink:0}
+.sb-item .si-sub{font-size:10px;color:var(--dim);display:block;line-height:1.3}
+.sb-item .si-badge{margin-left:auto;font-size:9px;background:var(--red);color:#fff;padding:1px 5px;border-radius:2px;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px}
+.sb-divider{height:1px;background:var(--border);margin:8px 14px}
+
+/* ── DETAIL PANEL ── */
+.detail{flex:1;padding:24px 28px}
+.detail-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.detail-color-bar{width:4px;height:60px;border-radius:2px;flex-shrink:0;margin-top:4px}
+.detail-title{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;letter-spacing:2px;line-height:1.2}
+.detail-sub{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.5}
+.detail-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.tag{font-size:10px;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 9px;border:1px solid;border-radius:1px}
+.tag-red{color:var(--red);border-color:rgba(232,0,45,.3);background:rgba(232,0,45,.07)}
+.tag-gold{color:var(--gold);border-color:rgba(245,200,66,.3);background:rgba(245,200,66,.07)}
+.tag-blue{color:var(--blue);border-color:rgba(30,143,255,.3);background:rgba(30,143,255,.07)}
+.tag-green{color:var(--green);border-color:rgba(0,201,106,.3);background:rgba(0,201,106,.07)}
+.tag-gray{color:var(--muted);border-color:var(--border2);background:var(--card2)}
+
+/* ── STATS GRID ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:20px}
+.stat-card{background:var(--card);border:1px solid var(--border);padding:14px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--red)}
+.stat-val{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--text);line-height:1}
+.stat-lbl{font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:1px;text-transform:uppercase}
+
+/* ── SECTIONS ── */
+.section{margin-bottom:22px}
+.section-title{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--card);border:1px solid var(--border)}
+.info-row .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.info-row .v{font-size:12px;font-weight:500;text-align:right}
+.driver-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.driver-card{background:var(--card);border:1px solid var(--border);padding:14px 16px;position:relative;overflow:hidden}
+.driver-card .d-num{font-family:'Rajdhani',sans-serif;font-size:36px;font-weight:700;color:var(--border2);position:absolute;right:12px;top:8px;line-height:1}
+.driver-card .d-name{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:1px}
+.driver-card .d-nat{font-size:11px;color:var(--muted);margin-top:2px}
+.driver-card .d-stat{margin-top:10px;font-size:11px;color:var(--dim)}
+.driver-card .d-stat span{color:var(--text);font-weight:500}
+
+/* ── NEWS ── */
+.news-btn{display:flex;align-items:center;gap:8px;background:var(--red);border:none;color:#fff;padding:10px 20px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:background .15s;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);margin-bottom:16px}
+.news-btn:hover{background:#c50025}
+.news-btn:disabled{background:var(--dim);cursor:not-allowed}
+.news-item{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--red);padding:14px 16px;margin-bottom:8px;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.news-item .n-src{font-size:10px;font-family:'Rajdhani',sans-serif;letter-spacing:2px;color:var(--red);text-transform:uppercase;margin-bottom:4px}
+.news-item .n-title{font-size:14px;font-weight:500;line-height:1.5;margin-bottom:6px}
+.news-item .n-body{font-size:12px;color:var(--muted);line-height:1.7}
+.news-loading{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;padding:16px 0}
+.dots span{display:inline-block;width:5px;height:5px;background:var(--red);border-radius:50%;margin:0 2px;animation:dot 1.2s infinite}
+.dots span:nth-child(2){animation-delay:.2s}
+.dots span:nth-child(3){animation-delay:.4s}
+@keyframes dot{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+
+/* ── CIRCUIT SVG ── */
+.circuit-svg-wrap{background:var(--card);border:1px solid var(--border);overflow:hidden;margin-bottom:16px;display:flex;align-items:center;justify-content:center;min-height:220px}
+.circuit-svg-wrap svg{width:100%;height:auto;display:block}
+.circuit-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;color:var(--dim);gap:8px}
+.circuit-placeholder .cp-icon{font-size:36px;opacity:0.3}
+
+/* ── KNOWLEDGE ── */
+.knowledge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:20px}
+.know-card{background:var(--card);border:1px solid var(--border);padding:16px;cursor:pointer;transition:all .15s;border-top:2px solid transparent}
+.know-card:hover{background:var(--card2);border-top-color:var(--red)}
+.know-card.active{background:var(--card2);border-top-color:var(--red)}
+.know-card .kc-icon{font-size:22px;margin-bottom:8px;opacity:.8}
+.know-card .kc-title{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px}
+.know-card .kc-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.know-detail{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--red);padding:18px 20px}
+.know-detail .kd-title{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:2px;color:var(--red2);margin-bottom:12px}
+.know-detail .kd-body{font-size:13px;line-height:1.85;color:#ccc}
+.kd-body strong{color:var(--text);font-weight:500}
+.kd-body .hl{background:rgba(232,0,45,.08);border-left:2px solid var(--red);padding:10px 14px;margin:10px 0;font-size:12px;color:#ddd;line-height:1.7}
+.kd-body .fc{display:inline-flex;align-items:center;gap:5px;background:var(--card2);border:1px solid var(--border2);padding:3px 9px;font-size:11px;margin:3px;color:var(--gold);font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:1px}
+
+/* ── WELCOME ── */
+.welcome-panel{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;color:var(--muted)}
+.wp-icon{font-size:48px;opacity:.25;margin-bottom:16px}
+.wp-title{font-family:'Rajdhani',sans-serif;font-size:20px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+.wp-sub{font-size:13px;line-height:1.7;max-width:320px}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ── CALENDAR GRID ── */
+.cal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.cal-card{background:var(--card);border:1px solid var(--border);padding:12px 14px;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.cal-card:hover{background:var(--card2);border-left-color:var(--red)}
+.cal-card.active{background:var(--card2);border-left-color:var(--red)}
+.cal-card .cc-round{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--dim);text-transform:uppercase}
+.cal-card .cc-name{font-size:13px;font-weight:500;margin-top:3px}
+.cal-card .cc-date{font-size:11px;color:var(--muted);margin-top:2px}
+.cal-card .cc-badge{display:inline-block;font-size:9px;background:rgba(30,143,255,.15);color:var(--blue);border:1px solid rgba(30,143,255,.25);padding:1px 6px;margin-top:4px;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px}
+.cal-card .cc-badge.new{background:rgba(232,0,45,.15);color:var(--red2);border-color:rgba(232,0,45,.25)}
+
+/* ── TEAM GRID for overview ── */
+.team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.team-overview-card{background:var(--card);border:1px solid var(--border);padding:14px 16px;cursor:pointer;transition:all .15s;border-top:3px solid;position:relative;overflow:hidden}
+.team-overview-card:hover{background:var(--card2)}
+.team-overview-card .tc-name{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;margin-bottom:4px}
+.team-overview-card .tc-engine{font-size:11px;color:var(--muted);margin-bottom:8px}
+.team-overview-card .tc-pts{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--text)}
+.team-overview-card .tc-pts-lbl{font-size:10px;color:var(--dim);letter-spacing:1px;text-transform:uppercase}
+.team-overview-card .tc-pos{position:absolute;right:12px;top:10px;font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--border2)}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">F1</div>
+  <div class="logo-sub"><span>百科</span> · WIKI</div>
+  <div class="topbar-right">
+    <div class="search-wrap">
+      <input class="search-input" id="global-search" placeholder="搜索车队、赛道、车手..." oninput="onSearch(this.value)" onkeydown="if(event.key==='Enter')doSearch()">
+      <button class="search-btn" onclick="doSearch()">⌕</button>
+    </div>
+    <div class="season-badge">2026 · 赛季进行中</div>
+    <button onclick="openSettings()" style="background:var(--card2);border:1px solid var(--border2);color:var(--muted);padding:6px 12px;cursor:pointer;font-size:13px;margin-left:8px;transition:color .15s" title="设置 API Key" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">⚙</button>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div id="settings-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:999;align-items:center;justify-content:center">
+  <div style="background:var(--panel);border:1px solid var(--border2);border-top:3px solid var(--red);padding:28px;width:460px;max-width:92vw">
+    <div style="font-family:Rajdhani,sans-serif;font-size:18px;font-weight:700;letter-spacing:2px;margin-bottom:18px">⚙ API KEY 设置</div>
+
+    <div style="font-size:11px;font-family:Rajdhani,sans-serif;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">
+      TAVILY KEY · 负责实时搜索
+    </div>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:8px">
+      获取地址：<a href="https://app.tavily.com" target="_blank" style="color:var(--blue)">app.tavily.com</a>
+      · 免费 1000次/月 · 格式 <span style="font-family:monospace;color:var(--muted)">tvly-...</span>
+    </div>
+    <input id="tavily-key-input" type="password" placeholder="tvly-xxxxxxxxxxxxxxxx"
+      style="width:100%;background:var(--card2);border:1px solid var(--border2);color:var(--text);padding:10px 14px;font-size:13px;outline:none;margin-bottom:4px;font-family:monospace;border-radius:2px"
+      oninput="checkTavilyKey(this.value)">
+    <div id="tavily-key-status" style="font-size:11px;margin-bottom:18px;height:14px"></div>
+
+    <div style="font-size:11px;font-family:Rajdhani,sans-serif;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">
+      DEEPSEEK KEY · 负责整理输出
+    </div>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:8px">
+      获取地址：<a href="https://platform.deepseek.com/api_keys" target="_blank" style="color:var(--blue)">platform.deepseek.com</a>
+      · 极低费用约¥0.02/次 · 格式 <span style="font-family:monospace;color:var(--muted)">sk-...</span>
+    </div>
+    <input id="api-key-input" type="password" placeholder="sk-xxxxxxxxxxxxxxxx"
+      style="width:100%;background:var(--card2);border:1px solid var(--border2);color:var(--text);padding:10px 14px;font-size:13px;outline:none;margin-bottom:4px;font-family:monospace;border-radius:2px"
+      oninput="checkKey(this.value)">
+    <div id="key-status" style="font-size:11px;margin-bottom:20px;height:14px"></div>
+
+    <div style="font-size:11px;color:var(--dim);margin-bottom:16px;padding:10px 12px;background:var(--card);border-left:2px solid var(--border2)">
+      🔒 两个 Key 均只保存在<strong style="color:var(--text)">本地浏览器</strong>中，不经过任何服务器
+    </div>
+
+    <div style="display:flex;gap:10px">
+      <button onclick="saveKey()" style="flex:1;background:var(--red);border:none;color:#fff;padding:11px;font-family:Rajdhani,sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer">保存</button>
+      <button onclick="clearKey()" style="background:var(--card2);border:1px solid var(--border2);color:var(--muted);padding:11px 16px;font-family:Rajdhani,sans-serif;font-size:13px;cursor:pointer">清除全部</button>
+      <button onclick="closeSettings()" style="background:var(--card2);border:1px solid var(--border2);color:var(--muted);padding:11px 16px;font-family:Rajdhani,sans-serif;font-size:13px;cursor:pointer">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('teams')" id="tab-teams"><span class="t-icon">🏎️</span> 车队 <span class="tab-count">11</span></button>
+  <button class="tab" onclick="switchTab('circuits')" id="tab-circuits"><span class="t-icon">🏁</span> 赛道 <span class="tab-count">22</span></button>
+  <button class="tab" onclick="switchTab('knowledge')" id="tab-knowledge"><span class="t-icon">📖</span> 科普</button>
+  <button class="tab" onclick="switchTab('news')" id="tab-news"><span class="t-icon">📡</span> 资讯 <span class="tab-count" id="news-badge" style="color:var(--red)">LIVE</span></button>
+</div>
+
+<!-- APP -->
+<div class="app">
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar"></nav>
+  <!-- MAIN -->
+  <div class="main-area" id="main-area">
+    <div class="welcome-panel" id="welcome">
+      <div class="wp-icon">🏎️</div>
+      <div class="wp-title">F1 百科全书</div>
+      <div class="wp-sub">选择左侧任意条目查看详情，或切换顶部标签页浏览不同分类</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════
+const TEAMS = {
+  redbull:{name:'Red Bull Racing',color:'#3671C6',engine:'Honda RBPT',base:'Milton Keynes, UK',founded:2005,
+    chassis:'RB21',power:'Honda RBPT 006',
+    drivers:[
+      {num:1,name:'Max Verstappen',nat:'🇳🇱 荷兰',dob:'1997.09.30',champs:4,
+       bio:'四届世界冠军，史上最年轻F1冠军（2010年16岁首次测试），2021-2024年横扫车手总冠军。以激进驾驶风格和强悍心理素质著称。',
+       stats:{races:'200+',wins:'62',poles:'40+',podiums:'110+'}},
+      {num:22,name:'Liam Lawson',nat:'🇳🇿 新西兰',dob:'2002.02.11',champs:0,
+       bio:'新西兰车手，红牛青训出身，2023/2024赛季多次顶替受伤车手出赛表现亮眼，2026年获得正式席位。',
+       stats:{races:'15+',wins:'0',poles:'0',podiums:'0'}}
+    ],
+    stats:{wcc:'6次 (2010-13, 2022-23)',wdc:'8次 (Vettel×4, Verstappen×4)',poles:'100+',wins:'120+'},
+    history:['2005年成立，由Red Bull能量饮料公司收购Jaguar Racing','2010-2013年维特尔统治时期，四连冠','2014-2021年相对低迷，寻找新方向','2022年Verstappen首冠，新规则下重新崛起','2022-2023年近乎完美的赛季表现','2024年争冠McL/Ferrari竞争加剧','2025年诺里斯夺冠，红牛面临规则转型压力'],
+    desc:'世界上最成功的F1车队之一，2022-2023年统治了整个赛季。2026年与Honda继续合作，面对全新规则的挑战。',
+    tags:['英国基地','Honda动力','蓝牛配色']},
+  ferrari:{name:'Scuderia Ferrari',color:'#E8002D',engine:'Ferrari',base:'Maranello, 意大利',founded:1950,
+    chassis:'SF-26',power:'Ferrari 066/12',
+    drivers:[
+      {num:16,name:'Charles Leclerc',nat:'🇲🇨 摩纳哥',dob:'1997.10.16',champs:0,
+       bio:'摩纳哥王子，天才车速毋庸置疑，职业生涯多次因机械故障和策略失误与冠军擦肩。2026年与汉密尔顿搭档，是法拉利双王牌组合。',
+       stats:{races:'130+',wins:'8',poles:'25+',podiums:'40+'}},
+      {num:44,name:'Lewis Hamilton',nat:'🇬🇧 英国',dob:'1985.01.07',champs:7,
+       bio:'史上最成功F1车手，7届世界冠军（与舒马赫并列），103个单站冠军。2025年离开效力13年的梅赛德斯加盟法拉利，是F1史上最震撼的转会之一。',
+       stats:{races:'350+',wins:'103',poles:'104',podiums:'197'}}
+    ],
+    stats:{wcc:'16次',wdc:'15次',poles:'240+',wins:'243'},
+    history:['1950年首届F1即参赛，是唯一从未中断的车队','1952-1953 Ascari两连冠','1975-1979 Lauda/Scheckter黄金期','1999-2004 舒马赫五连冠鼎盛时期','2007-2008 Räikkönen/Massa失冠遗憾','2010-2013 维特尔时代无缘冠军','2022-2024 竞争力回归但时运不佳','2025年汉密尔顿加盟引发全球轰动'],
+    desc:'F1历史上最成功的车队，2025年签下汉密尔顿引发轰动。2026年新规则是法拉利翻身的最大机会。',
+    tags:['意大利传奇','自研引擎','汉密尔顿加盟']},
+  mercedes:{name:'Mercedes-AMG F1',color:'#27F4D2',engine:'Mercedes',base:'Brackley, UK',founded:2010,
+    chassis:'W17',power:'Mercedes M17 EQ Power+',
+    drivers:[
+      {num:63,name:'George Russell',nat:'🇬🇧 英国',dob:'1998.02.15',champs:0,
+       bio:'英国车手，以高度稳定性和精准技术著称，被誉为"Mr Saturday"（排位赛专家）。汉密尔顿离开后成为梅赛德斯领军人物。',
+       stats:{races:'100+',wins:'2',poles:'3',podiums:'12+'}},
+      {num:12,name:'Kimi Antonelli',nat:'🇮🇹 意大利',dob:'2006.08.25',champs:0,
+       bio:'2006年出生的天才新星，18岁即接替汉密尔顿的梅赛德斯席位。意大利青训产品，被誉为近年来最受期待的新秀。',
+       stats:{races:'10+',wins:'1',poles:'1',podiums:'3+'}}
+    ],
+    stats:{wcc:'8次 (2014-21)',wdc:'7次 (Hamilton×7)',poles:'130+',wins:'125'},
+    history:['2010年以布劳恩GP为基础重建','2014年涡轮混动规则变革，开始统治时代','2014-2021年八连冠，F1历史最强王朝','2022年地面效应规则变革，竞争力下滑','2022-2024年寻找赛车平衡点','2025年汉密尔顿离开，安东内利接班','2026年新规则是重返巅峰最大机会'],
+    desc:'2014-2021年统治F1长达8年。汉密尔顿离开后启用年轻天才安东内利，2026年全新规则是他们重返巅峰的机会。',
+    tags:['英国基地','自研引擎','安东内利新星']},
+  mclaren:{name:'McLaren F1 Team',color:'#FF8000',engine:'Mercedes',base:'Woking, UK',founded:1966,
+    chassis:'MCL39',power:'Mercedes M17',
+    drivers:[
+      {num:4,name:'Lando Norris',nat:'🇬🇧 英国',dob:'1999.11.13',champs:1,
+       bio:'2025年世界冠军，以友善性格和快速车速著称。从2019年出道到2025年夺冠，经历了麦拿伦的完整复兴旅程。直播文化标杆，拥有庞大粉丝群体。',
+       stats:{races:'130+',wins:'8',poles:'6',podiums:'35+'}},
+      {num:81,name:'Oscar Piastri',nat:'🇦🇺 澳大利亚',dob:'2001.04.06',champs:0,
+       bio:'澳大利亚车手，2022年冲出F2以完美战绩入主F1，以冷静头脑和稳定发挥著称。被视为未来冠军热门。',
+       stats:{races:'50+',wins:'3',poles:'2',podiums:'15+'}}
+    ],
+    stats:{wcc:'8次',wdc:'12次',poles:'155+',wins:'183'},
+    history:['1966年Bruce McLaren创立','1974年埃默森·菲蒂帕尔迪夺冠','1984-1991年黄金时代：Lauda/Prost/Senna','1998-1999年哈基宁两连冠','2000-2020年相对沉寂期','2021-2024年大复兴，逐步冲击前列','2025年诺里斯夺冠，28年来首个WDC'],
+    desc:'2025年诺里斯勇夺年度冠军，麦拿伦迎来28年来首个车手总冠军。2026年卫冕阵容保持稳定，进攻姿态明显。',
+    tags:['英国基地','橙色标志','诺里斯卫冕']},
+  aston:{name:'Aston Martin F1',color:'#229971',engine:'Mercedes',base:'Silverstone, UK',founded:2021,
+    chassis:'AMR26',power:'Mercedes M17',
+    drivers:[
+      {num:14,name:'Fernando Alonso',nat:'🇪🇸 西班牙',dob:'1981.07.29',champs:2,
+       bio:'两届世界冠军（2005-06），F1史上最全能车手之一。以超强防守技术、丰富经验和永不服输的精神著称。2026年44岁仍在F1顶级赛场征战。',
+       stats:{races:'390+',wins:'32',poles:'22',podiums:'106+'}},
+      {num:18,name:'Lance Stroll',nat:'🇨🇦 加拿大',dob:'2002.10.29',champs:0,
+       bio:'车队老板劳伦斯·斯特罗尔之子，职业生涯中获得多次领奖台但总冠军争夺中较难突破。',
+       stats:{races:'150+',wins:'0',poles:'1',podiums:'3+'}}
+    ],
+    stats:{wcc:'-',wdc:'-',poles:'1',wins:'1'},
+    history:['前身为Force India、Racing Point','2021年重品牌为Aston Martin','2023年大规模升级，赛季初期成绩惊艳','2023年中后期竞争力回落','2024年继续投入资源重建','2026年新总部落成，剑指前列'],
+    desc:'由劳伦斯·斯特罗尔家族全力投入，2023年曾冲击前三。阿隆索以43岁高龄继续证明自己仍是最顶级车手之一。',
+    tags:['英国基地','英伦绿色','阿隆索传奇']},
+  alpine:{name:'Alpine F1 Team',color:'#0093CC',engine:'Renault',base:'Enstone, UK',founded:2021,
+    chassis:'A526',power:'Renault E-Tech 26',
+    drivers:[
+      {num:10,name:'Pierre Gasly',nat:'🇫🇷 法国',dob:'1996.02.07',champs:0,
+       bio:'法国车手，2020年意大利站夺冠是职业生涯最高光时刻。在红牛二队被降级后于AlphaTauri/VCARB重建，2023年转会Alpine。',
+       stats:{races:'130+',wins:'1',poles:'0',podiums:'4+'}}  ,
+      {num:31,name:'Esteban Ocon',nat:'🇫🇷 法国',dob:'1996.09.17',champs:0,
+       bio:'法国车手，2021年匈牙利站夺冠。以稳定性和车内数据贡献著称，和Gasly组成全法国阵容。',
+       stats:{races:'130+',wins:'1',poles:'0',podiums:'3+'}}
+    ],
+    stats:{wcc:'-',wdc:'-',poles:'0',wins:'2'},
+    history:['前身为Renault，多次冠名赞助商变更','2005-06年阿隆索两连冠的冠军机器','2021年重品牌为Alpine','2026年启用全新自研动力单元是最大赌注'],
+    desc:'雷诺家族品牌，全法国车手阵容。2026年自研新动力单元上阵，是否能打破中游格局是最大看点。',
+    tags:['英国基地','法国品牌','雷诺引擎']},
+  williams:{name:'Williams Racing',color:'#64C4FF',engine:'Mercedes',base:'Grove, UK',founded:1977,
+    chassis:'FW47',power:'Mercedes M17',
+    drivers:[
+      {num:23,name:'Alexander Albon',nat:'🇹🇭 泰国',dob:'1996.03.23',champs:0,
+       bio:'泰国-英国混血车手，曾入驻红牛正队但被降级，在威廉姆斯重建职业生涯并成为车队领袖。以精准反馈和对轮胎的敏锐感知著称。',
+       stats:{races:'100+',wins:'0',poles:'0',podiums:'2+'}}  ,
+      {num:2,name:'Franco Colapinto',nat:'🇦🇷 阿根廷',dob:'2003.05.27',champs:0,
+       bio:'阿根廷新星，2024年赛季中期替补上阵即展现出非凡速度，成为近年最受关注的新人之一。',
+       stats:{races:'15+',wins:'0',poles:'0',podiums:'0'}}
+    ],
+    stats:{wcc:'9次',wdc:'7次',poles:'128',wins:'114'},
+    history:['1977年弗兰克·威廉姆斯创立','1979-1997年黄金时代：9次车队冠军','1992年曼塞尔以最多积分赛季夺冠','2000年后竞争力持续下滑','2020年多利尔集团收购','2026年依托梅赛德斯动力寻求复兴'],
+    desc:'历史上最成功的私人车队，曾7度拿下车队冠军。近年财务困境影响竞争力，但正在重建中。',
+    tags:['英国基地','蓝白传统','历史豪门']},
+  haas:{name:'Haas F1 Team',color:'#B6BABD',engine:'Ferrari',base:'Kannapolis, USA',founded:2016,
+    chassis:'VF-26',power:'Ferrari 066/12',
+    drivers:[
+      {num:27,name:'Nico Hülkenberg',nat:'🇩🇪 德国',dob:'1987.08.19',champs:0,
+       bio:'绰号"Hulk"，F1历史上出赛次数最多的无领奖台纪录保持者（后被自己打破）。以稳定发挥和排位赛速度著称，2022年回归F1后表现强势。',
+       stats:{races:'200+',wins:'0',poles:'1',podiums:'0'}}  ,
+      {num:87,name:'Oliver Bearman',nat:'🇬🇧 英国',dob:'2005.05.08',champs:0,
+       bio:'2005年出生的英国新星，2024年费拉利替补出赛立即得分引发轰动。是F1最年轻的积分获得者之一。',
+       stats:{races:'20+',wins:'0',poles:'0',podiums:'0'}}
+    ],
+    stats:{wcc:'-',wdc:'-',poles:'0',wins:'0'},
+    history:['2016年首个美国本土F1车队加入','2018年大幅进步，进入中游竞争','2023年马格努森退赛，比尔曼崛起','2024年比尔曼正式加入，成绩稳定','2026年继续使用法拉利动力包'],
+    desc:'美国籍车队，使用法拉利动力和大量零件。以精简运营著称，比尔曼作为年轻核心引发关注。',
+    tags:['美国车队','Ferrari动力','比尔曼新星']},
+  rb:{name:'VCARB (RB)',color:'#6692FF',engine:'Honda RBPT',base:'Faenza, 意大利',founded:1985,
+    chassis:'VCARB 02',power:'Honda RBPT 006',
+    drivers:[
+      {num:22,name:'Yuki Tsunoda',nat:'🇯🇵 日本',dob:'2000.05.11',champs:0,
+       bio:'日本车手，2021年加入F1至今是在役最久的日本车手。以激进风格和进攻性超车著称，也因无线电情绪化表达广为人知。',
+       stats:{races:'100+',wins:'0',poles:'0',podiums:'0'}}  ,
+      {num:6,name:'Isack Hadjar',nat:'🇫🇷 法国',dob:'2004.02.28',champs:0,
+       bio:'法国-阿尔及利亚车手，红牛青训精英，2024年F2冠军，2026年晋升F1正式席位。',
+       stats:{races:'10+',wins:'0',poles:'0',podiums:'0'}}
+    ],
+    stats:{wcc:'-',wdc:'-',poles:'1',wins:'1'},
+    history:['1985年成立为Minardi，历史最悠久的小车队','2006年红牛收购更名Toro Rosso','Vettel/Ricciardo/Verstappen均从此起步','2020年更名AlphaTauri','2024年更名VCARB，维持红牛培育机制'],
+    desc:'红牛二队，历史最悠久小车队之一，曾培育维特尔/里卡多/维斯塔潘等冠军。角田裕毅是在F1坚持最久的日本车手。',
+    tags:['意大利基地','红牛二队','Honda动力']},
+  sauber:{name:'Audi F1 (Sauber)',color:'#A7A7A7',engine:'Audi',base:'Hinwil, 瑞士',founded:1993,
+    chassis:'C46',power:'Audi F1 PU (过渡期Ferrari)',
+    drivers:[
+      {num:27,name:'Nico Hülkenberg',nat:'🇩🇪 德国',dob:'1987.08.19',champs:0,
+       bio:'从Haas转会Audi/Sauber，成为Audi品牌F1首席车手。其丰富经验对于新品牌初期发展至关重要。',
+       stats:{races:'200+',wins:'0',poles:'1',podiums:'0'}}  ,
+      {num:5,name:'Gabriel Bortoleto',nat:'🇧🇷 巴西',dob:'2004.10.14',champs:0,
+       bio:'巴西新星，2024年F2冠军，McLaren青训精英。被视为下一个巴西F1明星，接过塞纳/巴里切罗的巴西荣耀。',
+       stats:{races:'10+',wins:'0',poles:'0',podiums:'0'}}
+    ],
+    stats:{wcc:'-',wdc:'-',poles:'1',wins:'1'},
+    history:['1993年以Sauber身份参赛','多年使用法拉利客户引擎','2016年被奥地利企业家收购','2024年更名为Kick Sauber','2026年Audi正式接管，以全新品牌登场','未来将逐步过渡到全自研Audi动力单元'],
+    desc:'2026年以全新Audi品牌正式登场，是本赛季最大看点。大众集团首次以厂队身份参战F1，长期目标是争夺冠军。',
+    tags:['瑞士基地','Audi首秀','博尔托莱托']},
+  cadillac:{name:'Cadillac F1 Team',color:'#CC0000',engine:'Ferrari',base:'Indianapolis, USA',founded:2026,
+    chassis:'CADI-01',power:'Ferrari 066/12 (客户)',
+    drivers:[
+      {num:50,name:'Callum Ilott',nat:'🇬🇧 英国',dob:'1998.11.11',champs:0,
+       bio:'英国车手，多年IndyCar经验，成为Cadillac F1首批车手之一。IndyCar背景让他在美国本土赛道具备独特优势。',
+       stats:{races:'5+',wins:'0',poles:'0',podiums:'0'}}  ,
+      {num:51,name:'Marcus Armstrong',nat:'🇳🇿 新西兰',dob:'2000.05.21',champs:0,
+       bio:'新西兰车手，前红牛青训，IndyCar转战F1。Cadillac首个赛季的学习者，以稳定性为首要目标。',
+       stats:{races:'5+',wins:'0',poles:'0',podiums:'0'}}
+    ],
+    stats:{wcc:'-',wdc:'-',poles:'0',wins:'0'},
+    history:['Andretti Global多年申请F1席位被拒','2024年FIA批准第11支车队资格','通用汽车Cadillac品牌赞助命名','2026年首个赛季正式登场','未来目标：2029年引入GM自研动力单元'],
+    desc:'2026年全新加入的第11支车队，由通用汽车旗下凯迪拉克赞助。首个赛季学习为主，未来将使用自研GM动力，长远目标是在美国本土树立品牌形象。',
+    tags:['美国新军','2026新队','GM支持']}
+};
+
+const CIRCUITS_2026 = [
+  {key:'melbourne',round:1,name:'澳大利亚大奖赛',circuit:'Albert Park',country:'🇦🇺',date:'3月8日',len:'5.278km',laps:58,hasSVG:false},
+  {key:'shanghai',round:2,name:'中国大奖赛',circuit:'上海国际赛车场',country:'🇨🇳',date:'3月15日',sprint:true,len:'5.451km',laps:56,hasSVG:false},
+  {key:'suzuka',round:3,name:'日本大奖赛',circuit:'铃鹿赛道',country:'🇯🇵',date:'3月29日',len:'5.807km',laps:53,hasSVG:true},
+  {key:'miami',round:4,name:'迈阿密大奖赛',circuit:'Miami International Autodrome',country:'🇺🇸',date:'5月3日',sprint:true,len:'5.412km',laps:57,hasSVG:false},
+  {key:'canada',round:5,name:'加拿大大奖赛',circuit:'Gilles Villeneuve',country:'🇨🇦',date:'5月24日',sprint:true,len:'4.361km',laps:70,hasSVG:false},
+  {key:'monaco',round:6,name:'摩纳哥大奖赛',circuit:'摩纳哥街道赛道',country:'🇲🇨',date:'6月7日',len:'3.337km',laps:78,hasSVG:true},
+  {key:'barcelona',round:7,name:'西班牙大奖赛',circuit:'巴塞罗那-加泰罗尼亚',country:'🇪🇸',date:'6月14日',len:'4.675km',laps:66,hasSVG:false},
+  {key:'spielberg',round:8,name:'奥地利大奖赛',circuit:'红牛赛道',country:'🇦🇹',date:'6月28日',len:'4.318km',laps:71,hasSVG:false},
+  {key:'silverstone',round:9,name:'英国大奖赛',circuit:'银石赛道',country:'🇬🇧',date:'7月5日',sprint:true,len:'5.891km',laps:52,hasSVG:false},
+  {key:'spa',round:10,name:'比利时大奖赛',circuit:'斯帕-弗朗科尔尚',country:'🇧🇪',date:'7月19日',len:'7.004km',laps:44,hasSVG:false},
+  {key:'budapest',round:11,name:'匈牙利大奖赛',circuit:'Hungaroring',country:'🇭🇺',date:'7月26日',len:'4.381km',laps:70,hasSVG:false},
+  {key:'zandvoort',round:12,name:'荷兰大奖赛',circuit:'赞德福特赛道',country:'🇳🇱',date:'8月23日',sprint:true,len:'4.259km',laps:72,hasSVG:false,note:'最终一届'},
+  {key:'monza',round:13,name:'意大利大奖赛',circuit:'蒙扎',country:'🇮🇹',date:'9月6日',len:'5.793km',laps:53,hasSVG:true},
+  {key:'madrid',round:14,name:'西班牙大奖赛·马德里',circuit:'Madring Circuit',country:'🇪🇸',date:'9月13日',len:'TBD',laps:null,hasSVG:false,isNew:true},
+  {key:'baku',round:15,name:'阿塞拜疆大奖赛',circuit:'巴库市区赛道',country:'🇦🇿',date:'9月26日 ★周六',len:'6.003km',laps:51,hasSVG:false},
+  {key:'singapore',round:16,name:'新加坡大奖赛',circuit:'滨海湾街道赛道',country:'🇸🇬',date:'10月11日',sprint:true,len:'5.063km',laps:62,hasSVG:false,note:'夜赛'},
+  {key:'austin',round:17,name:'美国大奖赛',circuit:'Circuit of the Americas',country:'🇺🇸',date:'10月25日',len:'5.513km',laps:56,hasSVG:false},
+  {key:'mexico',round:18,name:'墨西哥城大奖赛',circuit:'Hermanos Rodriguez',country:'🇲🇽',date:'11月1日',len:'4.304km',laps:71,hasSVG:false},
+  {key:'saopaulo',round:19,name:'巴西大奖赛',circuit:'英特拉格斯',country:'🇧🇷',date:'11月8日',len:'4.309km',laps:71,hasSVG:false},
+  {key:'lasvegas',round:20,name:'拉斯维加斯大奖赛',circuit:'拉斯维加斯街道赛道',country:'🇺🇸',date:'11月21日 ★周六',len:'6.201km',laps:50,hasSVG:false,note:'夜赛'},
+  {key:'qatar',round:21,name:'卡塔尔大奖赛',circuit:'卢赛尔国际赛道',country:'🇶🇦',date:'11月29日',len:'5.419km',laps:57,hasSVG:false},
+  {key:'abudhabi',round:22,name:'阿布扎比大奖赛',circuit:'亚斯码头赛道',country:'🇦🇪',date:'12月6日',len:'5.281km',laps:58,hasSVG:false,note:'季终站'}
+];
+
+const CIRCUIT_DETAILS = {
+  monaco:{desc:'F1王冠上的明珠，自1929年首届，与印第安纳波利斯500、勒芒24小时并称赛车三大赛。整个摩纳哥公国就是赛道，极窄街道、护墙近、几乎无法超车，排位赛成绩决定一切。',tags:['街道赛','逆时针','极难超车','三大赛之一'],info:{速度特征:'低速/中速',最慢弯:'Grand Hotel发卡弯 ~50km/h',最快圈速:'1:10.166 (Leclerc, 2021)',超车难度:'★★★★★',赛道朝向:'逆时针',最窄处:'约6.5m',特殊路段:'隧道段（唯一室内路段）'}},
+  suzuka:{desc:'铃鹿赛道由本田1962年建造，全球唯一8字形F1赛道，被无数车手评选为最爱。S字弯、130R、发卡弯等标志性弯道造就了无数经典时刻。Senna vs Prost的对决永载史册。',tags:['8字形','顺时针','技术全能','本田主场'],info:{速度特征:'高速/技术',最快圈速:'1:30.983 (Hamilton, 2019)',最高速段:'主直道/130R前 ~320km/h',最慢弯:'发卡弯 ~80km/h',超车难度:'★★★☆☆',赛道朝向:'顺时针',赛道特点:'8字形立交跨桥'}},
+  monza:{desc:'意大利速度神殿，1922年建成几乎从未缺席F1。超长直道、三段减速区、最低下压力设定，平均时速F1最快。法拉利Tifosi球迷是F1最狂热的观众群体，胜利庆典盛况空前。',tags:['高速赛道','顺时针','速度神殿','Tifosi圣地'],info:{速度特征:'超高速',最快圈速:'1:21.046 (Barrichello, 2004)',顶速:'360km/h+',平均时速:'约260km/h',超车难度:'★★☆☆☆',赛道朝向:'顺时针',下压力设定:'全年最低'}},
+  melbourne:{desc:'传统开幕站，依托艾伯特公园湖泊而建。2022年赛道重新设计，多处慢速弯改为中高速弯道，比赛观赏性大幅提升。每年F1季的第一战，充满未知与期待。',tags:['开幕站','半街道','中高速','2022改造'],info:{速度特征:'中速/高速',赛道类型:'半永久街道',超车难度:'★★★☆☆',赛道朝向:'顺时针',DRS区段:'3个',改造年份:'2022年'}},
+  shanghai:{desc:'上海国际赛道因疫情缺席多年后重返赛历，以超长T6-7弧形弯和高速T1-2发卡弯著称。2026年作为冲刺站举行，是亚洲赛季最具竞争力的赛道之一。',tags:['冲刺站','逆时针','长弧弯','2024回归'],info:{速度特征:'中速/技术',赛道类型:'永久赛道',超车难度:'★★★☆☆',赛道朝向:'逆时针',DRS区段:'2个',特色弯道:'T6-7长弧弯 >10秒G力'}},
+  miami:{desc:'迈阿密国际赛道建在NFL硬石球场周围，2022年首届。5月初高温高湿，是轮胎热衰退的重要考场。赛道设施豪华，是F1美国扩张的重要一站。',tags:['冲刺站','顺时针','NFL球场旁','高温考验'],info:{速度特征:'中速/高速',赛道类型:'永久赛道',超车难度:'★★☆☆☆',赛道朝向:'顺时针',气候:'5月约35°C，高湿度',DRS区段:'3个'}},
+  canada:{desc:'维伦纽夫赛道以冠军之墙著称，建在圣劳伦斯河小岛上。长直道、重刹车、对刹车系统极度考验。2026年作为冲刺站举行，超车机会相对较多。',tags:['冲刺站','顺时针','冠军之墙','重刹车'],info:{速度特征:'中高速',赛道类型:'永久赛道',超车难度:'★★☆☆☆',赛道朝向:'顺时针',DRS区段:'2个',著名景点:'冠军之墙（最终发卡弯护墙）'}},
+  barcelona:{desc:'巴塞罗那加泰罗尼亚赛道是F1冬季测试传统主场，各车队数据积累最完整。弯道全面，超车难，策略重要。2026年是双西班牙赛季的第一战。',tags:['测试主场','顺时针','超车难','双西班牙'],info:{速度特征:'中速/技术',赛道类型:'永久赛道',超车难度:'★★★★☆',赛道朝向:'顺时针',DRS区段:'2个',特点:'全能型考场'}},
+  spielberg:{desc:'红牛赛道位于奥地利山区，海拔678m，空气稀薄对引擎和刹车冷却构成挑战。赛道虽短但节奏快，T1超车机会多，景色是F1最美之一。',tags:['山地赛道','顺时针','红牛主场','高海拔'],info:{速度特征:'高速/重刹车',赛道类型:'永久赛道',超车难度:'★★☆☆☆',赛道朝向:'顺时针',海拔:'678m',DRS区段:'2个'}},
+  silverstone:{desc:'F1世界锦标赛历史第一站（1950年），Maggotts-Becketts连续高速弯是全F1最壮观弯道序列。英国球迷热情，天气多变。2026年首次作为冲刺站。',tags:['F1发源地','冲刺站','高速弯组','1950首站'],info:{速度特征:'高速/技术',赛道类型:'永久赛道',超车难度:'★★☆☆☆',赛道朝向:'顺时针',最快圈速:'1:27.097 (Hamilton, 2020)',DRS区段:'2个'}},
+  spa:{desc:'斯帕被众多车手评选为世界最好赛道，全长7km穿越阿登森林。Eau Rouge/Raidillon传奇路段危险美丽，微气候独特，历史事故众多，是赛道传说的汇集地。',tags:['最长赛道','顺时针','森林赛道','Eau Rouge'],info:{速度特征:'高速/技术',赛道类型:'永久赛道',超车难度:'★★☆☆☆',赛道朝向:'顺时针',最快圈速:'1:41.252 (Bottas, 2018)',赛道长度:'7.004km（F1最长）',特点:'微气候：不同区域可同时晴雨'}},
+  budapest:{desc:'匈牙利赛道绰号"赛道上的摩纳哥"，弯道密集、超车极难，高温加剧轮胎磨损。排位赛成绩在这里比其他赛道更重要，策略是唯一出路。',tags:['弯道密集','顺时针','超车极难','高温赛道'],info:{速度特征:'低速/中速',赛道类型:'永久赛道',超车难度:'★★★★☆',赛道朝向:'顺时针',气候:'7月底约35°C',DRS区段:'1个'}},
+  zandvoort:{desc:'沙丘赛道，2021年重返日历恰逢维斯塔潘崛起，橙色军团爆满。拥有独特倾斜坡道弯，是F1少数保留此设计的赛道。2026年将是最后一届荷兰大奖赛。',tags:['坡道弯','逆时针','最终一届','橙色军团'],info:{速度特征:'高速/技术',赛道类型:'永久赛道',超车难度:'★★★☆☆',赛道朝向:'逆时针',特色设计:'多处倾斜坡道弯（Banked turns）',最后一届:'2026年'}},
+  madrid:{desc:'2026年全新赛道，围绕IFEMA马德里国际会展中心修建，是西班牙首都首次举办F1。各车队零历史数据，第一届比赛充满未知，谁能最快适应新赛道谁占先机。',tags:['2026首届','街道赛','零数据','西班牙新站'],info:{速度特征:'TBD',赛道类型:'街道赛道',超车难度:'TBD（预计较难）',赛道特点:'会展中心周边街道',首届年份:'2026'}},
+  baku:{desc:'巴库市区赛道以超长2.2km主直道和古城区7.6m极窄路段著称，"混乱之城"因安全车频发和末圈大逆转而闻名。2026年改为周六举行，配合国家纪念日。',tags:['街道赛','周六赛制','极窄路段','混乱之城'],info:{速度特征:'高速/街道',赛道类型:'街道赛道',超车难度:'★★☆☆☆（直道超车）',直道长度:'2.2km（F1最长直道）',最窄处:'古城区7.6m',赛制:'周六举行'}},
+  singapore:{desc:'F1唯一夜赛，1500盏灯照亮滨海湾，赤道气候高温高湿，体能要求最高。复杂街道布局安全车频繁，历史上多次诞生"意外冠军"。2026年首次作为冲刺站。',tags:['唯一夜赛','冲刺站','街道赛','赤道气候'],info:{速度特征:'中速',赛道类型:'街道赛道',超车难度:'★★★★☆',赛道朝向:'顺时针',灯光数量:'1500+盏',气候:'10月约32°C，湿度80%+'}},
+  austin:{desc:'COTA是专为F1设计的永久赛道，T1盲弯山顶是全球最刺激的超车点之一，Esses连续弯组向银石致敬。2026年是美洲三连站首站，综合技术考场。',tags:['美国赛道','逆时针','专为F1建','盲弯山顶'],info:{速度特征:'中速/高速',赛道类型:'永久赛道',超车难度:'★★☆☆☆',赛道朝向:'逆时针',最快圈速:'1:36.169 (Hamilton, 2019)',DRS区段:'2个'}},
+  mexico:{desc:'墨西哥城赛道海拔2285m是全F1最高，低气压对引擎冷却和刹车系统是极端挑战。球场内路段让20万球迷包围赛车，是全球最独特的F1体验之一。',tags:['全球最高海拔','顺时针','球场内路段','重刹车'],info:{速度特征:'高速/重刹车',赛道类型:'永久赛道',超车难度:'★★★☆☆',海拔:'2285m（F1最高）',气压影响:'引擎功率降低约3-5%',DRS区段:'3个'}},
+  saopaulo:{desc:'圣保罗英特拉格斯是塞纳的家乡赛道，逆时针布局是F1少数。11月雨季天气多变，历史上最多经典雨战场景。2008年汉密尔顿最后一个弯夺冠是F1最戏剧性时刻之一。',tags:['逆时针','塞纳圣地','雨战多','雨季赛道'],info:{速度特征:'高速/技术',赛道类型:'永久赛道',超车难度:'★★★☆☆',赛道朝向:'逆时针（罕见）',气候:'11月雨季，天气多变',DRS区段:'2个'}},
+  lasvegas:{desc:'拉斯维加斯大奖赛赛车直接在著名的Strip大道飞驰，凯撒宫、百乐宫就在旁边。11月深夜低温5-10°C使轮胎升温缓慢，是独特的技术挑战。',tags:['Strip大道','夜赛','周六赛制','低温挑战'],info:{速度特征:'高速/中速',赛道类型:'街道赛道',超车难度:'★★☆☆☆',赛道朝向:'顺时针',夜间气温:'约5-10°C（影响轮胎）',DRS区段:'2个'}},
+  qatar:{desc:'卢赛尔赛道紧邻2022年世界杯决赛场馆，以高轮胎负荷著称。2023年出现多辆赛车爆胎事件，FIA此后强制缩短换胎间隔。11月底气温仍高，体能消耗大。',tags:['紧邻世界杯场馆','高轮胎负荷','顺时针','11月高温'],info:{速度特征:'中速/技术',赛道类型:'永久赛道',超车难度:'★★★☆☆',赛道朝向:'顺时针',轮胎负荷:'全年最高之一（2023年爆胎事件）',气候:'11月底约30°C'}},
+  abudhabi:{desc:'亚斯码头赛道自2009年是传统季终站，赛道穿越亚斯酒店建筑下方是标志性景观。2020年改造大幅提升观赏性，2021年最后一圈改写历史，是F1最具争议的季终战。',tags:['季终站','逆时针','2021争议','酒店穿越'],info:{速度特征:'中速/高速',赛道类型:'永久赛道',超车难度:'★★★☆☆',赛道朝向:'逆时针',最快圈速:'1:26.103 (Verstappen, 2021)',改造年份:'2020年（大幅提升）'}}
+};
+
+const KNOWLEDGE = [
+  {id:'aero',icon:'🌀',title:'空气动力学',sub:'下压力 · 阻力 · 气流',
+    body:`F1赛车通过<strong>前翼、后翼、扩散器</strong>产生向下压力，让轮胎获得超强抓地力，得以在弯道以极高速度行驶。<br><br>
+    <div class="hl"><strong>下压力（Downforce）</strong>：气流经过翼片时，上方加速产生低压、下方减速产生高压，压差形成向下的力。<br><strong>阻力（Drag）</strong>：任何产生下压力的部件都会同时增加阻力，两者永远是矛盾——更多下压力=更慢直线速度。<br><strong>扩散器</strong>：车底后部利用文丘里效应，将车底气流加速形成低压区，"吸"住地面，效率比翼片更高。</div>
+    <strong>2026年主动空气动力学</strong>：翼片可自动调节，弯道最大下压力+直道最小阻力，取代了2011-2025年的DRS系统。<br>
+    <span class="fc">高速下下压力>车重</span><span class="fc">理论可倒挂行驶</span><span class="fc">弯道G力5G+</span><span class="fc">前翼产生约25%下压力</span>`},
+  {id:'engine',icon:'⚡',title:'动力单元',sub:'1000马力混动系统',
+    body:`2014年起F1使用<strong>混合动力单元（PU）</strong>，由6个部件组成，总功率约1000马力，热效率超50%。<br><br>
+    <div class="hl"><strong>ICE</strong>（内燃机）1.6L V6涡轮增压，约570马力，最高转速15000rpm<br><strong>MGU-K</strong>动能电机：刹车回收→储能→加速助推120kW（163马力）<br><strong>MGU-H</strong>热能电机：连接涡轮，消除迟滞（2026年移除）<br><strong>ES</strong>储能电池 + <strong>TC</strong>涡轮增压器 + <strong>CE</strong>控制单元</div>
+    <strong>2026年全新规则</strong>：移除MGU-H，电动功率占比约50%，使用100%可持续燃料。Audi、Honda（RBPT）、Mercedes、Ferrari全部基于新规重新研发。<br><span class="fc">热效率50%+</span><span class="fc">普通车仅35%</span><span class="fc">每季限用3套ICE</span><span class="fc">2026起50%电力</span>`},
+  {id:'tyres',icon:'🔵',title:'轮胎系统',sub:'化合物 · 温度窗口 · 策略',
+    body:`倍耐力独家供应，干地5种化合物C1（最硬）到C5（最软），每站选3种：<br><br>
+    <span class="fc" style="color:#fff">⬜ 硬胎 C1/C2</span><span class="fc" style="color:var(--gold)">🟡 中性胎 C3/C4</span><span class="fc" style="color:var(--red)">🔴 软胎 C4/C5</span><br><br>
+    <div class="hl"><strong>工作温度窗口</strong>：约90-110°C最佳抓地力。太冷→打滑；太热→起泡脱层（Blistering）。<br>出站时蛇形行驶目的：通过侧向摩擦快速升温进入工作窗口。</div>
+    <strong>强制规定</strong>：干地比赛至少使用两种化合物（强制进站换胎），增加策略多样性。<br>
+    <strong>雨胎</strong>：Full Wet（全雨胎）和 Inter（中间胎），每小时排水量约30升。<span class="fc">软胎圈速最快</span><span class="fc">进站换胎约2-3秒</span><span class="fc">轮胎工作温度90-110°C</span>`},
+  {id:'flags',icon:'🚩',title:'旗帜信号',sub:'安全通信系统',
+    body:`<div class="hl">🟡 <strong>黄旗</strong>：危险，禁止超车，必须减速（双黄旗=随时准备停车）<br>🔴 <strong>红旗</strong>：比赛中止，立即减速返回维修站<br>🏁 <strong>方格旗</strong>：比赛结束<br>🔵 <strong>蓝旗</strong>：被套圈，必须让行（无视3次=处罚）<br>🟢 <strong>绿旗</strong>：危险解除<br>⬛⬜ <strong>黑白旗</strong>：警告，不正当驾驶<br>⬛ <strong>纯黑旗</strong>：取消资格（极罕见）<br>🟠 <strong>橙圆旗</strong>：赛车技术故障，须进站（与圆形橙点配合）</div>
+    <strong>安全车（SC）</strong>：严重事故时上路，所有车跟随，禁止超车，差距清零。<br>
+    <strong>虚拟安全车（VSC）</strong>：纯电子管控，各车维持最低圈速，不需实体安全车上路。`},
+  {id:'strategy',icon:'♟️',title:'比赛策略',sub:'Undercut · Overcut · 进站',
+    body:`策略是F1的隐形战场，工程师实时分析数百个数据点在几秒内做决策。<br><br>
+    <div class="hl"><strong>Undercut</strong>：提前进站换新胎→新胎速度快→前车进站期间我跑出更快圈速→前车出来时我已超越<br><strong>Overcut</strong>：前车进站后我继续跑→轻车优势快→进站后出来仍在前面<br><strong>Free Stop（免费进站）</strong>：安全车期间进站，损失时间最少，是策略大转折点</div>
+    <strong>进站时间构成</strong>：换胎约2-3秒 + 进站道行驶约15-18秒 = 总损失约20秒。因此超车机会需要在跑圈中追回。<br>
+    <strong>遥测数据</strong>：工程师实时监控每条轮胎的温度、压力、磨损率，精确预测最佳进站时机。<span class="fc">最快换胎1.82秒</span><span class="fc">进站总损失约20秒</span>`},
+  {id:'points',icon:'🏆',title:'积分制度',sub:'25-18-15…积分分配',
+    body:`现行制度（2010年至今）：前10名得分，外加最快圈速额外1分。<br><br>
+    <span class="fc">P1: 25</span><span class="fc">P2: 18</span><span class="fc">P3: 15</span><span class="fc">P4: 12</span><span class="fc">P5: 10</span><span class="fc">P6: 8</span><span class="fc">P7: 6</span><span class="fc">P8: 4</span><span class="fc">P9: 2</span><span class="fc">P10: 1</span><span class="fc" style="color:var(--gold)">最快圈: +1</span><br><br>
+    <div class="hl"><strong>车手冠军（WDC）</strong>：年度个人总积分最高，获世界车手冠军奖杯<br><strong>车队冠军（WCC）</strong>：两位车手积分之和最高，决定商业收入分配<br><strong>冲刺赛积分</strong>：前8名得分 8-7-6-5-4-3-2-1，2026年共6站冲刺赛</div>
+    <strong>历史制度</strong>：最初只有前5名得分（8-6-4-3-2），积分制多次演变，每次变革都影响赛季格局。`},
+  {id:'drs',icon:'📡',title:'DRS → 主动气动',sub:'超车辅助系统演变',
+    body:`<strong>DRS（2011-2025）</strong>：后翼可动翼片在指定区域打开，减少阻力，直线速度提升约10-15km/h，帮助后车超车。激活条件：距前车1秒内+进入DRS检测区。<br><br>
+    <div class="hl"><strong>2026年革命：DRS退场</strong>，替换为"主动空气动力学（Active Aero）"——前后翼根据行驶状态自动调节，弯道高下压力，直道低阻力，无需驾驶员手动操作。<br><strong>超车模式（Overtake Mode）</strong>：后车距前车1秒内进入指定区域，可使用更多ERS电力，效果类似但更自然。</div>
+    <strong>为什么废除DRS</strong>：DRS被批过于机械，导致"公路超车"失去驾驶对决戏剧性。主动空气动力学旨在让超车更自然。<span class="fc">2026起无DRS</span><span class="fc">主动空气动力学</span>`},
+  {id:'safety',icon:'🛡️',title:'安全系统',sub:'Halo · HANS · 生存单元',
+    body:`F1安全技术经历数十年演进，现代F1几乎杜绝了致命事故。<br><br>
+    <div class="hl"><strong>Halo（光环）2018年引入</strong>：钛合金头部保护，可承受12吨静压力，已多次救命：Grosjean 2020巴林火焰事故、Zhou 2022英国翻车、Leclerc 2022奥地利碎片<br><strong>HANS装置</strong>：头颈支撑系统，防止碰撞时颈椎损伤<br><strong>碳纤维Monocoque</strong>：吸能生存舱，设计用于在高速碰撞中保持乘员完好<br><strong>FIA医疗车</strong>：全程跟随，任何事故点45秒内必须到达</div>
+    <span class="fc">Halo承重12吨</span><span class="fc">防火服耐700°C</span><span class="fc">头盔耐冲击800G</span>`},
+  {id:'2026reg',icon:'📐',title:'2026年全新规则',sub:'F1技术革命年',
+    body:`2026年是F1技术史上变化最大的年份，底盘和动力单元全部重新设计。<br><br>
+    <div class="hl"><strong>动力单元</strong>：移除MGU-H，电动功率占比约50%，全部使用100%可持续燃料<br><strong>空气动力学</strong>：主动空气动力学取代DRS，车身更小更轻（目标车重约768kg）<br><strong>新制造商</strong>：Audi首次以厂队参战，Ford与红牛合作，Honda以RBPT名义继续<br><strong>新车队</strong>：Cadillac加入成第11队，2016年Haas以来首支新队</div>
+    <strong>地面效应保留</strong>：2022年引入的地面效应规则继续，有助于赛车跟车。<strong>冲刺赛格式</strong>：保持6站冲刺，格式微调。<span class="fc">新动力单元</span><span class="fc">无DRS</span><span class="fc">100%可持续燃料</span>`},
+  {id:'pitstop',icon:'🔧',title:'维修站进站',sub:'2秒换4条轮胎的艺术',
+    body:`F1维修站进站是全球最精密的团队协作之一，约<strong>20人同时工作</strong>，在2-3秒内完成4条轮胎更换。<br><br>
+    <div class="hl"><strong>进站流程</strong>：赛车减速驶入→前顶车手抬起车身→左右轮胎工（各3人：气枪×1+轮胎×2）同时工作→换完信号灯变绿→车手油门离开<br><strong>人员分工</strong>：前后顶车各1人、左右各3人（共12人换胎）、稳定手、前后翼调整、灭火员、监察等约20人</div>
+    <strong>最快记录</strong>：1.82秒（红牛车队，2023年）<br>
+    <strong>失误惩罚</strong>：轮胎未锁紧脱落、过早落车等可导致罚款甚至禁赛，安全是最高优先级。<span class="fc">最快1.82秒</span><span class="fc">约20人协作</span><span class="fc">失误=安全事故</span>`},
+  {id:'quali',icon:'⏱️',title:'排位赛制度',sub:'Q1/Q2/Q3淘汰赛制',
+    body:`F1采用三段淘汰制排位赛（Qualifying），决定正赛发车顺序。<br><br>
+    <div class="hl"><strong>Q1（18分钟）</strong>：全部20辆赛车参赛，最慢5辆淘汰（P16-P20）<br><strong>Q2（15分钟）</strong>：剩余15辆参赛，最慢5辆淘汰（P11-P15）<br><strong>Q3（12分钟）</strong>：10辆争夺杆位，决定P1-P10</div>
+    <strong>关键规定</strong>：Q2中使用的轮胎必须在正赛起步时继续使用（影响策略）。<br>
+    <strong>冲刺赛周末</strong>：有额外的Sprint Qualifying（冲刺排位赛），决定100km冲刺赛的发车顺序，独立于正赛排位赛。<span class="fc">Q3 10辆争杆位</span><span class="fc">Q2轮胎规定影响策略</span>`},
+  {id:'groundeffect',icon:'🔮',title:'地面效应',sub:'2022规则核心：腹部产生下压力',
+    body:`地面效应是2022年F1规则变革的核心，通过车底产生大量下压力，而非依赖翼片。<br><br>
+    <div class="hl"><strong>工作原理</strong>：车底设计成文丘里形通道，气流从前部进入后加速，在车底产生大面积低压区，将车"吸"在地面。效率极高：同等下压力所产生的阻力远小于翼片。<br><strong>好处</strong>：跟车时受"dirty air"（尾流）影响大幅减少，让超车更容易，2022年超车次数创历史新高。</div>
+    <strong>"弹跳"问题（Porpoising）</strong>：2022年初各车队出现高速弹跳，因地面效应产生的低压使车底抬离地面→失去下压力→车底回落→循环往复。通过调高离地间隙解决。<span class="fc">2022年引入</span><span class="fc">2026年保留</span><span class="fc">超车次数大幅提升</span>`},
+  {id:'overtaking',icon:'💨',title:'超车技术',sub:'刹车点 · 跟车 · Slipstream',
+    body:`F1超车是技术与心理的双重博弈，不同类型超车需要不同技术。<br><br>
+    <div class="hl"><strong>刹车超车</strong>：在制动区刹车比前车更晚入弯（"out-braking"），用更快入弯速度超越。高风险：刹车过晚会冲出赛道。<br><strong>滑流超车（Slipstream）</strong>：跟随前车进入其气流低压区，阻力减少→速度更快→直道末端超越。长直道常见。<br><strong>双重指定（Double Duty）</strong>：同时利用滑流+超车模式，在直道末端以速度优势进攻。</div>
+    <strong>防守策略</strong>：车手只允许变线一次防守（若已变线，被攻方不得再次变线），违规视为阻挡。<span class="fc">只允许变线一次防守</span><span class="fc">早刹+弯内超车</span>`},
+  {id:'history',icon:'📜',title:'F1历史重要时刻',sub:'从1950到2026年',
+    body:`F1世界锦标赛自1950年首届，经历了无数传奇时刻：<br><br>
+    <div class="hl">1950 — 银石首届，Farina夺冠<br>1976 — Lauda/Hunt史诗对决，"Rush"原型<br>1984 — Senna vs Prost梅赛德斯内战<br>1994 — Senna在圣马力诺离世，F1安全革命<br>2000-04 — Schumacher/Ferrari五连冠<br>2008 — Hamilton最后一个弯夺冠（圣保罗）<br>2010-13 — Vettel/RedBull四连冠<br>2021 — 最终圈争议，Verstappen vs Hamilton<br>2022 — 地面效应新规，Verstappen首冠<br>2025 — Norris夺冠，McLaren 28年后重回巅峰</div>
+    <span class="fc">76年历史</span><span class="fc">1950年首届</span><span class="fc">逾千位车手参赛</span>`},
+  {id:'glossary',icon:'📖',title:'F1术语词典',sub:'常见专业词汇解释',
+    body:`<div class="hl"><strong>Undercut/Overcut</strong>：提前/延迟进站的策略行为<br><strong>Porpoising</strong>：地面效应导致的赛车高速弹跳<br><strong>Dirty Air</strong>：前车产生的湍流，影响后车下压力<br><strong>Marbles</strong>：轮胎磨损碎屑，积聚在赛道边缘，极滑<br><strong>Graining</strong>：轮胎表面颗粒化，使用不当的早期磨损<br><strong>Blistering</strong>：轮胎起泡，高温下橡胶脱层<br><strong>Safety Car/VSC</strong>：安全车/虚拟安全车<br><strong>Parc Fermé</strong>：比赛前封闭区域，禁止调整赛车<br><strong>Drag</strong>：阻力；<strong>Downforce</strong>：下压力<br><strong>ERS</strong>：能量回收系统<br><strong>DNF</strong>：Did Not Finish，未完赛<br><strong>DNS</strong>：Did Not Start，未起步</div>
+    <span class="fc">滑流 Slipstream</span><span class="fc">内外线 Inside/Outside</span><span class="fc">清洁空气 Clean Air</span>`},
+];
+
+// ══════════════════════════════════════════
+// SVG TRACKS
+// ══════════════════════════════════════════
+const TRACK_SVGS = {
+  monaco:`<svg viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg"><rect width="680" height="400" fill="#0c0c10"/>
+<path d="M200 330 L280 330 L310 325 L335 310 L345 290 L340 268 L325 255 L310 252 L298 258 L292 272 L296 288 L308 298 L318 296 L324 286 L320 274 L308 268 L300 272 L298 282 L302 290 L310 294 L320 290 L328 278 L325 264 L312 254 L296 250 L278 254 L265 266 L260 282 L263 298 L272 310 L285 318 L300 322" fill="none" stroke="#2c2c3a" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M200 330 L280 330 L310 325 L335 310 L345 290 L340 268 L325 255 L310 252 L298 258 L292 272 L295 286 L305 296 L316 295 L322 286 L319 275 L308 268 L300 271 L298 281 L301 289 L309 293 L319 289 L327 277 L324 264 L312 255 L296 251 L279 254 L266 266 L261 282 L264 298 L273 309 L285 318 L300 322 L180 322 L180 330" fill="none" stroke="#E8002D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+<line x1="178" y1="317" x2="178" y2="335" stroke="#fff" stroke-width="2"/>
+<circle cx="335" cy="310" r="3" fill="#E8002D"/><line x1="335" y1="307" x2="410" y2="285" stroke="#E8002D" stroke-width="0.6" opacity="0.5"/>
+<text x="413" y="282" fill="#ccc" font-size="11" font-family="Rajdhani,sans-serif">Sainte Devote</text>
+<circle cx="325" cy="255" r="3" fill="#E8002D"/><line x1="325" y1="252" x2="410" y2="210" stroke="#E8002D" stroke-width="0.6" opacity="0.5"/>
+<text x="413" y="207" fill="#ccc" font-size="11" font-family="Rajdhani,sans-serif">Casino Square</text>
+<circle cx="292" cy="272" r="4" fill="#f5c842"/><line x1="289" y1="272" x2="200" y2="245" stroke="#f5c842" stroke-width="0.6" opacity="0.5"/>
+<text x="100" y="237" fill="#f5c842" font-size="11" font-family="Rajdhani,sans-serif" text-anchor="start">Grand Hotel Hairpin</text>
+<text x="100" y="249" fill="#666" font-size="9" font-family="sans-serif">全F1最慢弯 ~50km/h</text>
+<circle cx="263" cy="298" r="3" fill="#E8002D"/><line x1="260" y1="298" x2="120" y2="298" stroke="#E8002D" stroke-width="0.6" opacity="0.5"/>
+<text x="117" y="294" fill="#ccc" font-size="11" font-family="Rajdhani,sans-serif" text-anchor="end">Portier</text>
+<rect x="268" y="308" width="26" height="7" fill="#444" opacity="0.6"/>
+<text x="281" y="330" fill="#666" font-size="9" font-family="sans-serif" text-anchor="middle">隧道</text>
+<circle cx="310" cy="294" r="3" fill="#00aaff"/><line x1="313" y1="294" x2="410" y2="335" stroke="#00aaff" stroke-width="0.6" opacity="0.5"/>
+<text x="413" y="332" fill="#ccc" font-size="11" font-family="Rajdhani,sans-serif">Nouvelle Chicane</text>
+<circle cx="285" cy="318" r="3.5" fill="#f5c842"/><line x1="282" y1="320" x2="120" y2="350" stroke="#f5c842" stroke-width="0.6" opacity="0.5"/>
+<text x="117" y="347" fill="#f5c842" font-size="11" font-family="Rajdhani,sans-serif" text-anchor="end">Rascasse ~50km/h</text>
+<circle cx="200" cy="330" r="3" fill="#00d068"/><line x1="200" y1="333" x2="120" y2="370" stroke="#00d068" stroke-width="0.6" opacity="0.5"/>
+<text x="117" y="367" fill="#00d068" font-size="11" font-family="Rajdhani,sans-serif" text-anchor="end">Anthony Noghes</text>
+<text x="178" y="312" fill="#fff" font-size="9" font-family="sans-serif" text-anchor="middle">S/F</text>
+<text x="420" y="28" fill="#E8002D" font-size="13" font-family="Rajdhani,sans-serif" font-weight="bold">MONACO  3.337km · 78圈 · 逆时针</text>
+</svg>`,
+
+  suzuka:`<svg viewBox="0 0 680 430" xmlns="http://www.w3.org/2000/svg"><rect width="680" height="430" fill="#0c0c10"/>
+<path d="M278 365 L278 338 L280 312 L286 288 L294 266 Q306 238 318 223 Q328 210 338 203 Q346 196 353 194 Q362 191 368 196 Q376 203 378 216 Q380 230 374 242 Q366 256 353 262 Q340 268 328 264 Q316 258 310 246 Q304 234 308 220 Q312 206 324 200 Q336 194 348 198 Q360 204 364 218 Q366 226 360 238 Q352 250 338 254 Q324 256 314 248 Q306 238 308 226 Q312 214 324 210 L318 223 Q300 236 288 258 Q276 280 270 306 Q266 326 268 346 Q270 366 276 380 Q282 394 292 402 Q306 410 323 408 Q338 406 348 396 Q360 384 362 368 Q364 350 356 334 Q346 316 330 306 Q314 296 298 294 Q283 293 270 298 Q258 305 254 316 Q250 328 254 340 Q260 354 272 360 Q286 366 300 362 Q312 358 318 348 Q324 336 320 324 Q314 312 302 308 Q290 306 282 314 L278 326 L278 365" fill="none" stroke="#2c2c3a" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M278 365 L278 338 L280 312 L286 288 L294 266 Q306 238 318 223 Q328 210 338 203 Q346 196 353 194 Q362 191 368 196 Q376 203 378 216 Q380 230 374 242 Q366 256 353 262 Q340 268 328 264 Q316 258 310 246 Q304 234 308 220 Q312 206 324 200 Q336 194 348 198 Q360 204 364 218 Q366 226 360 238 Q352 250 338 254 Q324 256 314 248 Q306 238 308 226 Q312 214 324 210 L318 223 Q300 236 288 258 Q276 280 270 306 Q266 326 268 346 Q270 366 276 380 Q282 394 292 402 Q306 410 323 408 Q338 406 348 396 Q360 384 362 368 Q364 350 356 334 Q346 316 330 306 Q314 296 298 294 Q283 293 270 298 Q258 305 254 316 Q250 328 254 340 Q260 354 272 360 Q286 366 300 362 Q312 358 318 348 Q324 336 320 324 Q314 312 302 308 Q290 306 282 314 L278 326 L278 365" fill="none" stroke="#1e8fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+<line x1="274" y1="358" x2="282" y2="374" stroke="#fff" stroke-width="2"/>
+<circle cx="294" cy="266" r="3.5" fill="#1e8fff"/><line x1="297" y1="264" x2="430" y2="218" stroke="#1e8fff" stroke-width="0.6" opacity="0.5"/>
+<text x="433" y="214" fill="#ccc" font-size="11" font-family="Rajdhani,sans-serif">S字弯 Esses T1–7</text>
+<text x="433" y="226" fill="#666" font-size="9" font-family="sans-serif">连续高速左右切换</text>
+<circle cx="368" cy="196" r="3.5" fill="#1e8fff"/><line x1="371" y1="196" x2="430" y2="168" stroke="#1e8fff" stroke-width="0.6" opacity="0.5"/>
+<text x="433" y="164" fill="#ccc" font-size="11" font-family="Rajdhani,sans-serif">Dunlop 弯</text>
+<circle cx="353" cy="262" r="3.5" fill="#1e8fff"/><line x1="356" y1="262" x2="430" y2="252" stroke="#1e8fff" stroke-width="0.6" opacity="0.5"/>
+<text x="433" y="248" fill="#ccc" font-size="11" font-family="Rajdhani,sans-serif">Degner 1 &amp; 2</text>
+<circle cx="282" cy="314" r="4.5" fill="#f5c842"/><line x1="279" y1="314" x2="125" y2="294" stroke="#f5c842" stroke-width="0.6" opacity="0.5"/>
+<text x="122" y="286" fill="#f5c842" font-size="11" font-family="Rajdhani,sans-serif" text-anchor="end">发卡弯 Hairpin</text>
+<text x="122" y="298" fill="#666" font-size="9" font-family="sans-serif" text-anchor="end">~80km/h 最慢弯</text>
+<circle cx="270" cy="306" r="3.5" fill="#00d068"/><line x1="267" y1="306" x2="125" y2="332" stroke="#00d068" stroke-width="0.6" opacity="0.5"/>
+<text x="122" y="328" fill="#00d068" font-size="11" font-family="Rajdhani,sans-serif" text-anchor="end">Spoon 弯</text>
+<circle cx="256" cy="340" r="4.5" fill="#ff4444"/><line x1="253" y1="340" x2="125" y2="364" stroke="#ff4444" stroke-width="0.6" opacity="0.5"/>
+<text x="122" y="360" fill="#ff4444" font-size="11" font-family="Rajdhani,sans-serif" text-anchor="end">130R ~300km/h 4G+</text>
+<circle cx="292" cy="402" r="3.5" fill="#1e8fff"/><line x1="295" y1="402" x2="430" y2="412" stroke="#1e8fff" stroke-width="0.6" opacity="0.5"/>
+<text x="433" y="408" fill="#ccc" font-size="11" font-family="Rajdhani,sans-serif">最终 Chicane</text>
+<text x="278" y="378" fill="#fff" font-size="9" font-family="sans-serif" text-anchor="middle">S/F</text>
+<text x="420" y="28" fill="#1e8fff" font-size="13" font-family="Rajdhani,sans-serif" font-weight="bold">SUZUKA  5.807km · 53圈 · 8字形</text>
+</svg>`,
+
+  monza:`<svg viewBox="0 0 680 390" xmlns="http://www.w3.org/2000/svg"><rect width="680" height="390" fill="#0c0c10"/>
+<path d="M140 285 L330 285 Q350 285 372 283 Q398 279 416 263 Q428 247 420 229 Q412 213 394 205 Q374 197 354 203 Q332 211 326 233 Q320 255 334 273 Q348 289 368 289 Q388 287 400 273 Q414 257 406 239 Q398 223 382 219 Q366 217 354 227 Q342 239 344 255 Q346 269 358 275 Q372 279 384 271 Q394 261 390 247 Q386 235 374 233 Q362 233 356 243 Q352 253 358 261 Q364 269 374 269 Q388 267 394 255 Q398 241 390 231 Q380 221 368 223 Q356 227 352 239 Q350 253 358 263" fill="none" stroke="#2c2c3a" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M140 285 L290 285 L316 285 L342 281 L364 271 L380 255 Q390 239 384 221 Q376 203 358 197 Q338 191 320 201 Q302 211 300 231 Q298 253 314 269 Q330 283 350 283" fill="none" stroke="#00c96a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+<line x1="136" y1="277" x2="136" y2="293" stroke="#fff" stroke-width="2"/>
+<circle cx="316" cy="285" r="4" fill="#00c96a"/><line x1="316" y1="282" x2="316" y2="242" stroke="#00c96a" stroke-width="0.6" opacity="0.5"/>
+<text x="316" y="236" fill="#ccc" font-size="11" font-family="Rajdhani,sans-serif" text-anchor="middle">Variante del Rettifilo</text>
+<circle cx="380" cy="255" r="3.5" fill="#ff8800"/><line x1="383" y1="255" x2="480" y2="223" stroke="#ff8800" stroke-width="0.6" opacity="0.5"/>
+<text x="483" y="219" fill="#ccc" font-size="11" font-family="Rajdhani,sans-serif">Curva Grande ~280km/h</text>
+<circle cx="384" cy="221" r="4" fill="#00c96a"/><line x1="387" y1="221" x2="480" y2="185" stroke="#00c96a" stroke-width="0.6" opacity="0.5"/>
+<text x="483" y="181" fill="#ccc" font-size="11" font-family="Rajdhani,sans-serif">Variante della Roggia</text>
+<circle cx="358" cy="197" r="3.5" fill="#1e8fff"/><line x1="358" y1="194" x2="480" y2="150" stroke="#1e8fff" stroke-width="0.6" opacity="0.5"/>
+<text x="483" y="146" fill="#ccc" font-size="11" font-family="Rajdhani,sans-serif">Lesmo 1 &amp; 2</text>
+<circle cx="300" cy="231" r="4" fill="#00c96a"/><line x1="297" y1="231" x2="130" y2="196" stroke="#00c96a" stroke-width="0.6" opacity="0.5"/>
+<text x="127" y="192" fill="#ccc" font-size="11" font-family="Rajdhani,sans-serif" text-anchor="end">Variante Ascari</text>
+<circle cx="300" cy="269" r="4.5" fill="#ff4444"/><line x1="297" y1="269" x2="130" y2="248" stroke="#ff4444" stroke-width="0.6" opacity="0.5"/>
+<text x="127" y="244" fill="#ff4444" font-size="11" font-family="Rajdhani,sans-serif" text-anchor="end">Curva Alboreto</text>
+<text x="127" y="256" fill="#666" font-size="9" font-family="sans-serif" text-anchor="end">出弯角度决定直道速度</text>
+<rect x="140" y="280" width="145" height="9" fill="#1a1a22" opacity="0.5"/>
+<text x="212" y="270" fill="#666" font-size="9" font-family="sans-serif" text-anchor="middle">主直道 顶速360km/h+</text>
+<text x="136" y="272" fill="#fff" font-size="9" font-family="sans-serif" text-anchor="middle">S/F</text>
+<text x="420" y="28" fill="#00c96a" font-size="13" font-family="Rajdhani,sans-serif" font-weight="bold">MONZA  5.793km · 53圈 · 速度神殿</text>
+</svg>`
+};
+
+// ══════════════════════════════════════════
+// STATE & ROUTING
+// ══════════════════════════════════════════
+let currentTab = 'teams';
+let currentItem = null;
+let newsCache = {};
+
+function switchTab(tab) {
+  currentTab = tab;
+  currentItem = null;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  renderSidebar();
+  showWelcome();
+}
+
+function showWelcome() {
+  document.getElementById('main-area').innerHTML = `<div class="welcome-panel"><div class="wp-icon">🏎️</div><div class="wp-title">选择条目查看详情</div><div class="wp-sub">从左侧列表选择车队、赛道或知识条目</div></div>`;
+}
+
+// ══════════════════════════════════════════
+// SIDEBAR RENDER
+// ══════════════════════════════════════════
+function renderSidebar() {
+  const sb = document.getElementById('sidebar');
+  if (currentTab === 'teams') {
+    sb.innerHTML = `<div class="sb-section"><div class="sb-label">2026赛季 · 11支车队</div>` +
+      Object.entries(TEAMS).map(([k,t]) =>
+        `<button class="sb-item ${currentItem===k?'active':''}" onclick="showTeam('${k}')">
+          <span class="si-icon" style="color:${t.color}">▮</span>
+          <span>${t.name}<span class="si-sub">${t.engine} · ${t.base.split(',')[0]}</span></span>
+        </button>`).join('') + `</div>`;
+  } else if (currentTab === 'circuits') {
+    sb.innerHTML = `<div class="sb-section"><div class="sb-label">2026赛历 · 22站</div>` +
+      CIRCUITS_2026.map(c =>
+        `<button class="sb-item ${currentItem===c.key?'active':''}" onclick="showCircuit('${c.key}')">
+          <span class="si-icon">${c.country}</span>
+          <span>R${c.round} ${c.name.replace(/大奖赛/,'GP').replace(/·.*/,'')}<span class="si-sub">${c.date}${c.sprint?' · 冲刺':''}${c.isNew?' · 新站':''}</span></span>
+          ${c.hasSVG?'<span class="si-badge">图</span>':''}
+        </button>`).join('') + `</div>`;
+  } else if (currentTab === 'knowledge') {
+    sb.innerHTML = `<div class="sb-section"><div class="sb-label">F1 科普知识</div>` +
+      KNOWLEDGE.map(k =>
+        `<button class="sb-item ${currentItem===k.id?'active':''}" onclick="showKnowledge('${k.id}')">
+          <span class="si-icon">${k.icon}</span>
+          <span>${k.title}<span class="si-sub">${k.sub}</span></span>
+        </button>`).join('') + `</div>`;
+  } else if (currentTab === 'news') {
+    sb.innerHTML = `<div class="sb-section"><div class="sb-label">资讯分类</div>
+      ${['综合资讯','赛事结果','车队动态','技术解析','赛历变动'].map((n,i) =>
+        `<button class="sb-item ${currentItem==='news_'+i?'active':''}" onclick="showNews('${n}',${i})">${n}</button>`
+      ).join('')}</div>`;
+  }
+}
+
+// ══════════════════════════════════════════
+// TEAM PAGE
+// ══════════════════════════════════════════
+function showTeam(key) {
+  currentItem = key;
+  renderSidebar();
+  const t = TEAMS[key];
+  const main = document.getElementById('main-area');
+  main.innerHTML = `<div class="detail">
+    <div class="detail-header">
+      <div class="detail-color-bar" style="background:${t.color}"></div>
+      <div>
+        <div class="detail-title">${t.name}</div>
+        <div class="detail-sub">成立于 ${t.founded} · 总部: ${t.base} · 底盘: ${t.chassis||'-'} · 动力: ${t.power||t.engine}</div>
+        <div class="detail-tags">${t.tags.map(tg=>`<span class="tag tag-gray">${tg}</span>`).join('')}</div>
+      </div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card" style="--accent:${t.color}"><div class="stat-val">${t.stats.wcc}</div><div class="stat-lbl">车队冠军 WCC</div></div>
+      <div class="stat-card"><div class="stat-val">${t.stats.wdc}</div><div class="stat-lbl">车手冠军 WDC</div></div>
+      <div class="stat-card"><div class="stat-val">${t.stats.wins}</div><div class="stat-lbl">胜场数</div></div>
+      <div class="stat-card"><div class="stat-val">${t.stats.poles}</div><div class="stat-lbl">杆位数</div></div>
+    </div>
+    <div class="section"><div class="section-title">2026赛季阵容</div>
+      <div class="driver-cards">${t.drivers.map(d=>`
+        <div class="driver-card" style="border-top:3px solid ${t.color}">
+          <div class="d-num" style="color:${t.color}44">${d.num}</div>
+          <div class="d-name">${d.name}</div>
+          <div class="d-nat">${d.nat}</div>
+          ${d.champs?`<div class="d-stat" style="margin-top:6px">🏆 <span style="color:var(--gold)">${d.champs}次世界冠军</span></div>`:''}
+          <div class="d-stat" style="margin-top:8px;font-size:12px;color:#aaa;line-height:1.6">${d.bio}</div>
+          ${d.stats?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
+            ${Object.entries(d.stats).map(([k,v])=>`<div style="background:var(--card2);border:1px solid var(--border);padding:4px 8px;font-size:10px"><span style="color:var(--muted);letter-spacing:1px;text-transform:uppercase">${k}</span><br><span style="font-family:Rajdhani,sans-serif;font-size:14px;font-weight:700">${v}</span></div>`).join('')}
+          </div>`:''}
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="section"><div class="section-title">车队简介</div>
+      <p style="font-size:13px;line-height:1.8;color:#bbb">${t.desc}</p>
+    </div>
+    ${t.history?`<div class="section"><div class="section-title">历史时间线</div>
+      <div style="position:relative;padding-left:20px">
+        <div style="position:absolute;left:6px;top:4px;bottom:4px;width:1px;background:var(--border2)"></div>
+        ${t.history.map(h=>`<div style="position:relative;margin-bottom:10px;font-size:12px;color:#aaa;line-height:1.6">
+          <div style="position:absolute;left:-17px;top:6px;width:7px;height:7px;border-radius:50%;background:${t.color};opacity:.8"></div>
+          ${h}</div>`).join('')}
+      </div>
+    </div>`:''}
+    <div class="section"><div class="section-title">实时资讯</div>
+      <button class="news-btn" id="news-btn-${key}" onclick="fetchTeamNews('${key}','${t.name}',this)">⚡ 获取最新资讯</button>
+      <div id="team-news-${key}"></div>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════
+// CIRCUIT PAGE
+// ══════════════════════════════════════════
+function showCircuit(key) {
+  currentItem = key;
+  renderSidebar();
+  const c = CIRCUITS_2026.find(x=>x.key===key);
+  const det = CIRCUIT_DETAILS[key]||{desc:'详细信息即将更新。',tags:[],info:{}};
+  const svg = TRACK_SVGS[key];
+  const main = document.getElementById('main-area');
+  main.innerHTML = `<div class="detail">
+    <div class="detail-header">
+      <div class="detail-color-bar" style="background:var(--red)"></div>
+      <div>
+        <div class="detail-title">${c.country} ${c.name}</div>
+        <div class="detail-sub">${c.circuit} · ${c.date} · ${c.len} · ${c.laps?c.laps+'圈':'圈数TBD'}</div>
+        <div class="detail-tags">
+          <span class="tag tag-red">R${c.round}</span>
+          ${c.sprint?'<span class="tag tag-blue">冲刺站</span>':''}
+          ${c.isNew?'<span class="tag tag-gold">2026首届</span>':''}
+          ${c.note?`<span class="tag tag-gray">${c.note}</span>`:''}
+          ${det.tags.map(tg=>`<span class="tag tag-gray">${tg}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="circuit-svg-wrap">
+      ${svg ? svg : `<div class="circuit-placeholder"><div class="cp-icon">🏁</div><div style="font-size:12px">赛道SVG图即将加入</div></div>`}
+    </div>
+    <div class="section"><div class="section-title">赛道简介</div>
+      <p style="font-size:13px;line-height:1.8;color:#bbb">${det.desc}</p>
+    </div>
+    ${Object.keys(det.info).length?`<div class="section"><div class="section-title">赛道数据</div>
+      <div class="info-grid">${Object.entries(det.info).map(([k,v])=>
+        `<div class="info-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('')}
+      </div></div>`:''}
+    <div class="section"><div class="section-title">实时资讯</div>
+      <button class="news-btn" onclick="fetchCircuitNews('${key}','${c.name}',this)">⚡ 获取最新资讯</button>
+      <div id="circuit-news-${key}"></div>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════
+// KNOWLEDGE PAGE
+// ══════════════════════════════════════════
+function showKnowledge(id) {
+  currentItem = id;
+  renderSidebar();
+  const k = KNOWLEDGE.find(x=>x.id===id);
+  const main = document.getElementById('main-area');
+  main.innerHTML = `<div class="detail">
+    <div class="detail-header">
+      <div class="detail-color-bar" style="background:var(--red)"></div>
+      <div>
+        <div class="detail-title" style="display:flex;align-items:center;gap:10px"><span style="font-size:24px">${k.icon}</span>${k.title}</div>
+        <div class="detail-sub">${k.sub}</div>
+      </div>
+    </div>
+    <div class="know-detail" style="margin-bottom:20px">
+      <div class="kd-body">${k.body}</div>
+    </div>
+    <div class="section"><div class="section-title">有疑问？</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+        ${['请用更简单的方式解释','给我一个实际比赛中的例子','和其他赛车比有什么不同？'].map(q=>
+          `<button class="news-btn" style="margin:0;font-size:11px;padding:7px 14px" onclick="askAbout('${q}','${k.title}')">${q}</button>`
+        ).join('')}
+      </div>
+      <div id="know-qa"></div>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════
+// NEWS TAB
+// ══════════════════════════════════════════
+function showNews(category, idx) {
+  currentItem = 'news_' + idx;
+  renderSidebar();
+  const main = document.getElementById('main-area');
+  main.innerHTML = `<div class="detail">
+    <div class="detail-header">
+      <div class="detail-color-bar" style="background:var(--red)"></div>
+      <div>
+        <div class="detail-title">📡 ${category}</div>
+        <div class="detail-sub">AI 实时搜索 · 2026赛季</div>
+      </div>
+    </div>
+    <button class="news-btn" id="news-fetch-btn" onclick="fetchGeneralNews('${category}', this)">⚡ 获取最新 ${category}</button>
+    <div id="news-output"></div>
+  </div>`;
+  // Auto-load
+  const btn = document.getElementById('news-fetch-btn');
+  fetchGeneralNews(category, btn);
+}
+
+// ══════════════════════════════════════════
+// AI NEWS FETCHER — Tavily搜索 + DeepSeek整理
+// ══════════════════════════════════════════
+async function callAI(prompt, outputEl) {
+  const tavilyKey = localStorage.getItem('f1_tavily_key') || '';
+  const deepseekKey = localStorage.getItem('f1_api_key') || '';
+
+  if (!tavilyKey || !deepseekKey) {
+    outputEl.innerHTML = `<div class="news-item" style="border-left-color:var(--gold)">
+      <div class="n-src" style="color:var(--gold)">⚙ 需要配置</div>
+      <div class="n-title">请先设置 Tavily + DeepSeek API Key</div>
+      <div class="n-body">点击右上角 ⚙ 按钮，填入两个 Key 即可启用实时资讯功能。Key 只存储在本地浏览器中。</div>
+    </div>`;
+    return;
+  }
+
+  // Step 1: Tavily 搜索
+  outputEl.innerHTML = `<div class="news-loading"><div class="dots"><span></span><span></span><span></span></div><span>正在搜索最新资讯...</span></div>`;
+  let searchResults = '';
+  try {
+    const tRes = await fetch('https://api.tavily.com/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        api_key: tavilyKey,
+        query: prompt.replace(/请搜索|请提供|关于/g, '').trim() + ' F1 2026',
+        max_results: 5,
+        include_answer: false,
+        search_depth: 'basic'
+      })
+    });
+    const tData = await tRes.json();
+    searchResults = (tData.results || [])
+      .map(r => `标题：${r.title}\n来源：${r.url}\n内容：${r.content}`)
+      .join('\n\n---\n\n');
+  } catch (e) {
+    searchResults = '（搜索暂时不可用，使用模型已有知识回答）';
+  }
+
+  // Step 2: DeepSeek 整理
+  outputEl.innerHTML = `<div class="news-loading"><div class="dots"><span></span><span></span><span></span></div><span>正在整理分析...</span></div>`;
+  try {
+    const dRes = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + deepseekKey },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        max_tokens: 1200,
+        messages: [
+          {
+            role: 'system',
+            content: `你是F1资讯编辑，负责根据搜索结果整理成结构化资讯卡片。
+输出格式严格按照：每条用<N><SRC>来源</SRC><TITLE>标题（15字内）</TITLE><BODY>正文（80-120字，有具体数据）</BODY></N>包裹，输出3-5条。
+如果搜索结果不足，用已知的F1知识补充。用中文输出，语言简洁专业。`
+          },
+          {
+            role: 'user',
+            content: `用户问题：${prompt}\n\n搜索结果：\n${searchResults}\n\n请整理成资讯卡片输出。`
+          }
+        ]
+      })
+    });
+    const dData = await dRes.json();
+    const text = dData.choices?.[0]?.message?.content || '';
+    const items = [...text.matchAll(/<N><SRC>(.*?)<\/SRC><TITLE>(.*?)<\/TITLE><BODY>([\s\S]*?)<\/BODY><\/N>/g)];
+    if (items.length) {
+      outputEl.innerHTML = items.map((m, i) => `
+        <div class="news-item" style="animation-delay:${i * .08}s">
+          <div class="n-src">${m[1]}</div>
+          <div class="n-title">${m[2]}</div>
+          <div class="n-body">${m[3]}</div>
+        </div>`).join('');
+    } else {
+      outputEl.innerHTML = `<div class="news-item"><div class="n-body" style="color:var(--muted)">${text || '暂无结果，请稍后重试。'}</div></div>`;
+    }
+  } catch (e) {
+    outputEl.innerHTML = `<div class="news-item"><div class="n-body" style="color:var(--red)">⚠ DeepSeek 连接失败，请检查 Key 或网络</div></div>`;
+  }
+}
+
+async function fetchTeamNews(key, name, btn) {
+  const el = document.getElementById('team-news-' + key);
+  if (btn) btn.disabled = true;
+  await callAI(`请搜索F1车队 "${name}" 在2026赛季的最新资讯：当前积分排名、最近比赛表现、技术升级、车手状态、以及未来赛站展望。`, el);
+  if (btn) btn.disabled = false;
+}
+async function fetchCircuitNews(key, name, btn) {
+  const el = document.getElementById('circuit-news-' + key);
+  if (btn) btn.disabled = true;
+  await callAI(`请搜索F1 "${name}" 2026年赛事的最新情况：比赛结果（如已进行）或赛前准备、历史经典回顾、以及对本站比赛的预测分析。`, el);
+  if (btn) btn.disabled = false;
+}
+async function fetchGeneralNews(category, btn) {
+  const el = document.getElementById('news-output');
+  if (btn) btn.disabled = true;
+  const prompts = {
+    '综合资讯':'请搜索F1 2026赛季最新综合资讯：积分榜现状、最近三站比赛结果概要、重大新闻事件。',
+    '赛事结果':'请搜索F1 2026赛季最近几站的比赛结果：冠军、杆位、最快圈速、关键事件和排名变化。',
+    '车队动态':'请搜索F1 2026赛季各车队最新动态：技术升级方向、车手状态、竞争力分析、车队内部新闻。',
+    '技术解析':'请搜索F1 2026年新规则实施情况：主动空气动力学表现、各厂商新动力单元对比、技术亮点。',
+    '赛历变动':'请搜索F1 2026赛历是否有任何变动：取消、新增、日期调整的赛站，以及原因说明。'
+  };
+  await callAI(prompts[category] || `F1 2026 ${category} 最新资讯，请给出具体详细的内容。`, el);
+  if (btn) btn.disabled = false;
+}
+async function askAbout(q, topic) {
+  const el = document.getElementById('know-qa');
+  el.innerHTML = `<div class="news-loading"><div class="dots"><span></span><span></span><span></span></div><span>正在思考...</span></div>`;
+  await callAI(`关于F1"${topic}"，用户问：${q}。请用清晰的中文回答（150字内），可举2026赛季具体例子。`, el);
+}
+
+// ══════════════════════════════════════════
+// SEARCH
+// ══════════════════════════════════════════
+function onSearch(v) {}
+function doSearch() {
+  const q = document.getElementById('global-search').value.trim().toLowerCase();
+  if (!q) return;
+  // Try teams
+  for (const [k,t] of Object.entries(TEAMS)) {
+    if (t.name.toLowerCase().includes(q) || t.drivers.some(d=>d.name.toLowerCase().includes(q))) {
+      switchTab('teams'); setTimeout(()=>showTeam(k), 50); return;
+    }
+  }
+  // Try circuits
+  for (const c of CIRCUITS_2026) {
+    if (c.name.toLowerCase().includes(q) || c.circuit.toLowerCase().includes(q)) {
+      switchTab('circuits'); setTimeout(()=>showCircuit(c.key), 50); return;
+    }
+  }
+  // Try knowledge
+  for (const k of KNOWLEDGE) {
+    if (k.title.toLowerCase().includes(q)) {
+      switchTab('knowledge'); setTimeout(()=>showKnowledge(k.id), 50); return;
+    }
+  }
+}
+
+// ══════════════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════════════
+function openSettings() {
+  const overlay = document.getElementById('settings-overlay');
+  overlay.style.display = 'flex';
+  document.getElementById('tavily-key-input').value = localStorage.getItem('f1_tavily_key') || '';
+  document.getElementById('api-key-input').value = localStorage.getItem('f1_api_key') || '';
+  checkTavilyKey(document.getElementById('tavily-key-input').value);
+  checkKey(document.getElementById('api-key-input').value);
+}
+function closeSettings() {
+  document.getElementById('settings-overlay').style.display = 'none';
+}
+function saveKey() {
+  const tavilyVal = document.getElementById('tavily-key-input').value.trim();
+  const deepseekVal = document.getElementById('api-key-input').value.trim();
+  if (tavilyVal) localStorage.setItem('f1_tavily_key', tavilyVal);
+  if (deepseekVal) localStorage.setItem('f1_api_key', deepseekVal);
+  updateTopbarKeyStatus();
+  closeSettings();
+}
+function clearKey() {
+  localStorage.removeItem('f1_tavily_key');
+  localStorage.removeItem('f1_api_key');
+  document.getElementById('tavily-key-input').value = '';
+  document.getElementById('api-key-input').value = '';
+  document.getElementById('tavily-key-status').textContent = '';
+  document.getElementById('key-status').textContent = '';
+  updateTopbarKeyStatus();
+}
+function checkTavilyKey(val) {
+  const el = document.getElementById('tavily-key-status');
+  if (!el) return;
+  if (!val) { el.textContent = ''; return; }
+  if (val.startsWith('tvly-')) { el.textContent = '✓ 格式正确'; el.style.color = 'var(--green)'; }
+  else { el.textContent = '⚠ 应以 tvly- 开头'; el.style.color = 'var(--gold)'; }
+}
+function checkKey(val) {
+  const el = document.getElementById('key-status');
+  if (!el) return;
+  if (!val) { el.textContent = ''; return; }
+  if (val.startsWith('sk-')) { el.textContent = '✓ 格式正确'; el.style.color = 'var(--green)'; }
+  else { el.textContent = '⚠ 应以 sk- 开头'; el.style.color = 'var(--gold)'; }
+}
+function updateKeyStatus(val) {}
+function updateTopbarKeyStatus() {
+  const hasKeys = !!localStorage.getItem('f1_tavily_key') && !!localStorage.getItem('f1_api_key');
+  const hasSome = !!localStorage.getItem('f1_tavily_key') || !!localStorage.getItem('f1_api_key');
+  const btn = document.querySelector('button[onclick="openSettings()"]');
+  if (btn) btn.style.color = hasKeys ? 'var(--green)' : hasSome ? 'var(--gold)' : 'var(--muted)';
+}
+document.getElementById('settings-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeSettings();
+});
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+renderSidebar();
+updateTopbarKeyStatus();
+// Show teams overview by default
+const main = document.getElementById('main-area');
+main.innerHTML = `<div class="detail">
+  <div class="detail-header">
+    <div class="detail-color-bar" style="background:var(--red)"></div>
+    <div>
+      <div class="detail-title">2026赛季车队</div>
+      <div class="detail-sub">11支参赛车队 · 赛季进行中 · 点击卡片查看详情</div>
+    </div>
+  </div>
+  <div class="team-grid">
+    ${Object.entries(TEAMS).map(([k,t],i) => `
+      <div class="team-overview-card" style="border-top-color:${t.color}" onclick="showTeam('${k}')">
+        <div class="tc-pos">P${i+1}</div>
+        <div class="tc-name">${t.name.replace('Racing','').replace('Scuderia ','').replace(' F1 Team','').replace(' F1','')}</div>
+        <div class="tc-engine">${t.engine}</div>
+        <div class="tc-pts">${t.drivers[0]?.name.split(' ').pop()}</div>
+        <div class="tc-pts-lbl">${t.drivers[1]?.name.split(' ').pop()||''}</div>
+      </div>`).join('')}
+  </div>
+</div>`;
+</script>
+</body>
+</html>
