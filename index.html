@@ -97,11 +97,11 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .news-btn{display:flex;align-items:center;gap:8px;background:var(--red);border:none;color:#fff;padding:10px 20px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:background .15s;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);margin-bottom:16px}
 .news-btn:hover{background:#c50025}
 .news-btn:disabled{background:var(--dim);cursor:not-allowed}
-.news-item{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--red);padding:14px 16px;margin-bottom:8px;animation:fadeUp .3s ease}
+.news-item{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--red);padding:16px;margin-bottom:10px;animation:fadeUp .3s ease}
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.news-item .n-src{font-size:10px;font-family:'Rajdhani',sans-serif;letter-spacing:2px;color:var(--red);text-transform:uppercase;margin-bottom:4px}
-.news-item .n-title{font-size:14px;font-weight:500;line-height:1.5;margin-bottom:6px}
-.news-item .n-body{font-size:12px;color:var(--muted);line-height:1.7}
+.news-item .n-src{font-size:10px;font-family:'Rajdhani',sans-serif;letter-spacing:2px;color:var(--red);text-transform:uppercase;margin-bottom:6px}
+.news-item .n-title{font-size:15px;font-weight:500;line-height:1.5;margin-bottom:8px;color:var(--text)}
+.news-item .n-body{font-size:13px;color:#bbb;line-height:1.8}
 .news-loading{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;padding:16px 0}
 .dots span{display:inline-block;width:5px;height:5px;background:var(--red);border-radius:50%;margin:0 2px;animation:dot 1.2s infinite}
 .dots span:nth-child(2){animation-delay:.2s}
@@ -719,8 +719,10 @@ function renderSidebar() {
         </button>`).join('') + `</div>`;
   } else if (currentTab === 'news') {
     sb.innerHTML = `<div class="sb-section"><div class="sb-label">资讯分类</div>
-      ${['综合资讯','赛事结果','车队动态','技术解析','赛历变动'].map((n,i) =>
-        `<button class="sb-item ${currentItem==='news_'+i?'active':''}" onclick="showNews('${n}',${i})">${n}</button>`
+      ${['赛季积分榜','综合资讯','赛事结果','车队动态','技术解析','赛历变动'].map((n,i) =>
+        `<button class="sb-item ${currentItem==='news_'+i?'active':''}" onclick="showNews('${n}',${i})">
+          ${i===0?'📊 ':''}${n}${i===0?'<span class="si-badge" style="background:var(--green);margin-left:auto">实时</span>':''}
+        </button>`
       ).join('')}</div>`;
   }
 }
@@ -795,31 +797,94 @@ function showCircuit(key) {
       <div class="detail-color-bar" style="background:var(--red)"></div>
       <div>
         <div class="detail-title">${c.country} ${c.name}</div>
-        <div class="detail-sub">${c.circuit} · ${c.date} · ${c.len} · ${c.laps?c.laps+'圈':'圈数TBD'}</div>
-        <div class="detail-tags">
+        <div class="detail-sub">${c.circuit} · ${c.date}</div>
+        <div class="detail-sub" style="margin-top:2px">${c.len} · ${c.laps?c.laps+'圈':'圈数TBD'}</div>
+        <div class="detail-tags" style="margin-top:8px">
           <span class="tag tag-red">R${c.round}</span>
-          ${c.sprint?'<span class="tag tag-blue">冲刺站</span>':''}
-          ${c.isNew?'<span class="tag tag-gold">2026首届</span>':''}
+          ${c.sprint?'<span class="tag tag-blue">🏃 冲刺站</span>':''}
+          ${c.isNew?'<span class="tag tag-gold">🆕 2026首届</span>':''}
           ${c.note?`<span class="tag tag-gray">${c.note}</span>`:''}
-          ${det.tags.map(tg=>`<span class="tag tag-gray">${tg}</span>`).join('')}
+          ${det.tags.slice(0,3).map(tg=>`<span class="tag tag-gray">${tg}</span>`).join('')}
         </div>
       </div>
     </div>
-    <div class="circuit-svg-wrap">
-      ${svg ? svg : `<div class="circuit-placeholder"><div class="cp-icon">🏁</div><div style="font-size:12px">赛道SVG图即将加入</div></div>`}
-    </div>
+
+    ${svg?`<div class="circuit-svg-wrap">${svg}</div>`:`<div class="circuit-placeholder" style="min-height:120px"><div class="cp-icon">🏁</div><div style="font-size:12px">赛道图即将加入</div></div>`}
+
     <div class="section"><div class="section-title">赛道简介</div>
-      <p style="font-size:13px;line-height:1.8;color:#bbb">${det.desc}</p>
+      <p style="font-size:14px;line-height:1.85;color:#ccc">${det.desc}</p>
     </div>
+
     ${Object.keys(det.info).length?`<div class="section"><div class="section-title">赛道数据</div>
       <div class="info-grid">${Object.entries(det.info).map(([k,v])=>
-        `<div class="info-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('')}
+        `<div class="info-row"><span class="k">${k}</span><span class="v" style="font-size:12px">${v}</span></div>`).join('')}
       </div></div>`:''}
-    <div class="section"><div class="section-title">实时资讯</div>
-      <button class="news-btn" onclick="fetchCircuitNews('${key}','${c.name}',this)">⚡ 获取最新资讯</button>
+
+    <div class="section" id="ergast-section-${key}">
+      <div class="section-title">2026赛季成绩</div>
+      <div id="ergast-${key}">
+        <button class="news-btn" onclick="fetchErgast('${key}','${c.round}',this)" style="margin-bottom:0">
+          📊 加载真实成绩数据
+        </button>
+      </div>
+    </div>
+
+    <div class="section"><div class="section-title">最新资讯</div>
+      <button class="news-btn" onclick="fetchCircuitNews('${key}','${c.name}',this)">⚡ AI搜索最新消息</button>
       <div id="circuit-news-${key}"></div>
     </div>
   </div>`;
+}
+
+// ── Ergast API 真实成绩 ──
+async function fetchErgast(circuitKey, round, btn) {
+  const el = document.getElementById('ergast-' + circuitKey);
+  if (btn) btn.disabled = true;
+  el.innerHTML = `<div class="news-loading"><div class="dots"><span></span><span></span><span></span></div><span>正在加载官方成绩...</span></div>`;
+  try {
+    // 尝试获取正赛成绩
+    const res = await fetch(`https://ergast.com/api/f1/2026/${round}/results.json?limit=10`);
+    const data = await res.json();
+    const races = data?.MRData?.RaceTable?.Races;
+    if (!races || races.length === 0) {
+      // 比赛未举行，显示排位赛（如有）
+      el.innerHTML = `<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--gold);padding:14px 16px;font-size:13px;color:var(--muted)">
+        📅 本站比赛尚未举行，成绩将在赛后自动更新
+      </div>
+      <button class="news-btn" style="margin-top:10px" onclick="fetchErgast('${circuitKey}','${round}',this)">🔄 刷新</button>`;
+      return;
+    }
+    const race = races[0];
+    const results = race.Results || [];
+    el.innerHTML = `
+      <div style="background:var(--card2);border:1px solid var(--border);padding:10px 14px;margin-bottom:10px;font-size:12px;color:var(--muted)">
+        📅 ${race.raceName} · ${race.date} · ${race.Circuit?.circuitName}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${results.slice(0,10).map((r,i)=>{
+          const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+          const posColor = i===0?'var(--gold)':i<3?'#aaa':'var(--muted)';
+          return `<div style="background:var(--card);border:1px solid var(--border);${i<3?'border-left:3px solid var(--gold)':'border-left:3px solid var(--border)'};padding:10px 14px;display:flex;align-items:center;gap:10px">
+            <div style="font-family:Rajdhani,sans-serif;font-size:18px;font-weight:700;color:${posColor};width:28px;flex-shrink:0">${medal||r.position}</div>
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:500">${r.Driver.givenName} ${r.Driver.familyName}</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px">${r.Constructor.name}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="font-family:Rajdhani,sans-serif;font-size:13px;font-weight:700;color:var(--gold)">${r.points>0?'+'+r.points+'分':'-'}</div>
+              <div style="font-size:10px;color:var(--dim);margin-top:2px">${r.status==='Finished'?r.Time?.time||'完赛':r.status}</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+      ${race.Results?.[0]?.FastestLap?`<div style="margin-top:10px;background:var(--card);border:1px solid var(--border);border-left:3px solid var(--red);padding:10px 14px;font-size:12px">
+        ⚡ 最快圈速：${race.Results.find(r=>r.FastestLap?.rank==='1')?.Driver.familyName||'-'}
+        · ${race.Results.find(r=>r.FastestLap?.rank==='1')?.FastestLap?.Time?.time||'-'}
+      </div>`:''}`;
+  } catch(e) {
+    el.innerHTML = `<div style="color:var(--red);font-size:13px;padding:10px 0">⚠ 数据加载失败，请检查网络</div>
+    <button class="news-btn" style="margin-top:8px" onclick="fetchErgast('${circuitKey}','${round}',this)">重试</button>`;
+  }
 }
 
 // ══════════════════════════════════════════
@@ -834,17 +899,19 @@ function showKnowledge(id) {
     <div class="detail-header">
       <div class="detail-color-bar" style="background:var(--red)"></div>
       <div>
-        <div class="detail-title" style="display:flex;align-items:center;gap:10px"><span style="font-size:24px">${k.icon}</span>${k.title}</div>
+        <div class="detail-title" style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:22px">${k.icon}</span>${k.title}
+        </div>
         <div class="detail-sub">${k.sub}</div>
       </div>
     </div>
     <div class="know-detail" style="margin-bottom:20px">
-      <div class="kd-body">${k.body}</div>
+      <div class="kd-body" style="font-size:14px;line-height:1.9">${k.body}</div>
     </div>
-    <div class="section"><div class="section-title">有疑问？</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-        ${['请用更简单的方式解释','给我一个实际比赛中的例子','和其他赛车比有什么不同？'].map(q=>
-          `<button class="news-btn" style="margin:0;font-size:11px;padding:7px 14px" onclick="askAbout('${q}','${k.title}')">${q}</button>`
+    <div class="section"><div class="section-title">继续深入</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+        ${['请用更简单的方式解释','给我一个真实比赛中的例子','2026年有什么变化？'].map(q=>
+          `<button class="news-btn" style="margin:0;font-size:12px;padding:10px 16px;justify-content:flex-start" onclick="askAbout('${q}','${k.title}')">▶ ${q}</button>`
         ).join('')}
       </div>
       <div id="know-qa"></div>
@@ -859,20 +926,80 @@ function showNews(category, idx) {
   currentItem = 'news_' + idx;
   renderSidebar();
   const main = document.getElementById('main-area');
+  const isStandings = category === '赛季积分榜';
   main.innerHTML = `<div class="detail">
     <div class="detail-header">
       <div class="detail-color-bar" style="background:var(--red)"></div>
       <div>
         <div class="detail-title">📡 ${category}</div>
-        <div class="detail-sub">AI 实时搜索 · 2026赛季</div>
+        <div class="detail-sub">${isStandings ? 'Ergast 官方数据 · 实时更新' : 'AI 搜索整理 · 2026赛季'}</div>
       </div>
     </div>
-    <button class="news-btn" id="news-fetch-btn" onclick="fetchGeneralNews('${category}', this)">⚡ 获取最新 ${category}</button>
-    <div id="news-output"></div>
+    ${isStandings ? `<div id="standings-output"><div class="news-loading"><div class="dots"><span></span><span></span><span></span></div><span>加载积分榜...</span></div></div>`
+    : `<button class="news-btn" id="news-fetch-btn" onclick="fetchGeneralNews('${category}', this)">⚡ 获取最新 ${category}</button>
+       <div id="news-output"></div>`}
   </div>`;
-  // Auto-load
-  const btn = document.getElementById('news-fetch-btn');
-  fetchGeneralNews(category, btn);
+
+  if (isStandings) {
+    fetchStandings();
+  } else {
+    const btn = document.getElementById('news-fetch-btn');
+    fetchGeneralNews(category, btn);
+  }
+}
+
+async function fetchStandings() {
+  const el = document.getElementById('standings-output');
+  try {
+    const [dRes, cRes] = await Promise.all([
+      fetch('https://ergast.com/api/f1/2026/driverStandings.json'),
+      fetch('https://ergast.com/api/f1/2026/constructorStandings.json')
+    ]);
+    const dData = await dRes.json();
+    const cData = await cRes.json();
+    const drivers = dData?.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings || [];
+    const constructors = cData?.MRData?.StandingsTable?.StandingsLists?.[0]?.ConstructorStandings || [];
+
+    if (!drivers.length) {
+      el.innerHTML = `<div class="news-item" style="border-left-color:var(--gold)">
+        <div class="n-title">赛季积分榜尚未更新</div>
+        <div class="n-body">Ergast 数据库在比赛结束后约24小时更新。当前赛季数据待首站后刷新。</div>
+      </div>`;
+      return;
+    }
+
+    el.innerHTML = `
+      <div class="section"><div class="section-title">车手积分榜</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          ${drivers.slice(0,10).map((d,i)=>{
+            const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+            const teamColor = Object.values(TEAMS).find(t=>t.drivers.some(dr=>dr.name.includes(d.Driver.familyName)))?.color||'var(--border)';
+            return `<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid ${teamColor};padding:12px 14px;display:flex;align-items:center;gap:10px">
+              <div style="font-family:Rajdhani,sans-serif;font-size:20px;font-weight:700;color:${i<3?'var(--gold)':'var(--muted)'};width:32px;flex-shrink:0">${medal||d.position}</div>
+              <div style="flex:1">
+                <div style="font-size:14px;font-weight:500">${d.Driver.givenName} ${d.Driver.familyName}</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:2px">${d.Constructors?.[0]?.name||''}</div>
+              </div>
+              <div style="font-family:Rajdhani,sans-serif;font-size:22px;font-weight:700;color:var(--gold)">${d.points}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+      <div class="section" style="margin-top:20px"><div class="section-title">车队积分榜</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          ${constructors.slice(0,10).map((c,i)=>{
+            const teamColor = Object.values(TEAMS).find(t=>t.name.includes(c.Constructor.name)||c.Constructor.name.includes(t.name.split(' ')[0]))?.color||'var(--border)';
+            return `<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid ${teamColor};padding:12px 14px;display:flex;align-items:center;gap:10px">
+              <div style="font-family:Rajdhani,sans-serif;font-size:20px;font-weight:700;color:${i<3?'var(--gold)':'var(--muted)'};width:32px;flex-shrink:0">${i+1}</div>
+              <div style="flex:1;font-size:14px;font-weight:500">${c.Constructor.name}</div>
+              <div style="font-family:Rajdhani,sans-serif;font-size:22px;font-weight:700;color:var(--gold)">${c.points}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+  } catch(e) {
+    el.innerHTML = `<div class="news-item"><div class="n-body" style="color:var(--red)">⚠ 加载失败，请检查网络</div></div>`;
+  }
 }
 
 // ══════════════════════════════════════════
@@ -971,6 +1098,7 @@ async function fetchGeneralNews(category, btn) {
   const el = document.getElementById('news-output');
   if (btn) btn.disabled = true;
   const prompts = {
+    '赛季积分榜':'请提供F1 2026赛季最新积分榜情况，包括车手前5名积分和车队前5名积分，以及积分差距分析。',
     '综合资讯':'请搜索F1 2026赛季最新综合资讯：积分榜现状、最近三站比赛结果概要、重大新闻事件。',
     '赛事结果':'请搜索F1 2026赛季最近几站的比赛结果：冠军、杆位、最快圈速、关键事件和排名变化。',
     '车队动态':'请搜索F1 2026赛季各车队最新动态：技术升级方向、车手状态、竞争力分析、车队内部新闻。',
