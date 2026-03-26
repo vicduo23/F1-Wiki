@@ -160,6 +160,75 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .team-overview-card .tc-pts{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--text)}
 .team-overview-card .tc-pts-lbl{font-size:10px;color:var(--dim);letter-spacing:1px;text-transform:uppercase}
 .team-overview-card .tc-pos{position:absolute;right:12px;top:10px;font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--border2)}
+
+/* ── 设置悬浮按钮（始终可见）── */
+.fab-settings{position:fixed;bottom:24px;right:20px;z-index:200;width:52px;height:52px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(232,0,45,0.4);transition:transform .15s}
+.fab-settings:active{transform:scale(0.92)}
+.fab-settings.keyed{background:#0f6e3a;box-shadow:0 4px 16px rgba(0,200,100,0.3)}
+
+/* ── 手机端布局 ── */
+@media(max-width:700px){
+  html,body{height:100%;overflow:hidden}
+  /* 顶栏精简 */
+  .topbar{height:48px}
+  .logo{font-size:18px;padding:0 14px 0 12px;padding-right:24px}
+  .logo-sub{display:none}
+  .search-wrap{display:none}
+  .season-badge{display:none}
+  .topbar-right button[onclick="openSettings()"]{display:none}/* 用FAB替代 */
+
+  /* Tab 改成底部导航栏 */
+  .tabs{
+    order:99;height:58px;border-top:1px solid var(--border);border-bottom:none;
+    position:fixed;bottom:0;left:0;right:0;z-index:150;
+    background:rgba(7,7,10,0.97);backdrop-filter:blur(12px);
+    padding:0;justify-content:space-around
+  }
+  .tab{flex:1;flex-direction:column;gap:3px;padding:0;font-size:10px;letter-spacing:0.5px;height:100%}
+  .tab .t-icon{font-size:20px}
+  .tab-count{display:none}
+
+  /* 主体布局：侧边栏+内容上下排列 */
+  .app{flex-direction:column;height:calc(100vh - 48px - 58px);overflow:hidden}
+  .sidebar{
+    width:100%;height:auto;max-height:38vh;
+    border-right:none;border-bottom:1px solid var(--border);
+    flex-shrink:0;overflow-y:auto
+  }
+  .main-area{flex:1;overflow-y:auto;min-height:0}
+
+  /* 侧边栏列表变成横向滚动卡片 */
+  .sb-section{padding:8px 0 4px}
+  .sb-label{font-size:9px;padding:0 10px 6px}
+  .sb-item{padding:8px 12px;font-size:12px}
+
+  /* 内容区域适配 */
+  .detail{padding:14px 16px}
+  .detail-title{font-size:20px}
+  .stats-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .driver-cards{grid-template-columns:1fr}
+  .info-grid{grid-template-columns:1fr}
+  .team-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .knowledge-grid{grid-template-columns:repeat(2,1fr)}
+
+  /* FAB在手机上显示 */
+  .fab-settings{display:flex;bottom:70px}
+
+  /* 电路SVG限高 */
+  .circuit-svg-wrap{min-height:160px}
+
+  /* 弹窗全屏 */
+  #settings-overlay > div{
+    width:100vw !important;max-width:100vw !important;
+    height:100vh;border-radius:0;border:none;
+    overflow-y:auto;padding:24px 20px
+  }
+}
+
+/* 桌面端FAB隐藏（用顶栏按钮）*/
+@media(min-width:701px){
+  .fab-settings{display:none}
+}
 </style>
 </head>
 <body>
@@ -218,6 +287,9 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     </div>
   </div>
 </div>
+
+<!-- 设置悬浮按钮（手机端专用） -->
+<button class="fab-settings" id="fab-settings" onclick="openSettings()" title="设置 API Key">⚙</button>
 
 <!-- TABS -->
 <div class="tabs">
@@ -990,8 +1062,15 @@ function updateKeyStatus(val) {}
 function updateTopbarKeyStatus() {
   const hasKeys = !!localStorage.getItem('f1_tavily_key') && !!localStorage.getItem('f1_api_key');
   const hasSome = !!localStorage.getItem('f1_tavily_key') || !!localStorage.getItem('f1_api_key');
-  const btn = document.querySelector('button[onclick="openSettings()"]');
+  // 桌面端顶栏按钮
+  const btn = document.querySelector('button[onclick="openSettings()"]:not(#fab-settings)');
   if (btn) btn.style.color = hasKeys ? 'var(--green)' : hasSome ? 'var(--gold)' : 'var(--muted)';
+  // 手机端FAB
+  const fab = document.getElementById('fab-settings');
+  if (fab) {
+    fab.classList.toggle('keyed', hasKeys);
+    fab.textContent = hasKeys ? '✓' : '⚙';
+  }
 }
 document.getElementById('settings-overlay').addEventListener('click', function(e) {
   if (e.target === this) closeSettings();
